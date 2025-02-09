@@ -1,12 +1,12 @@
 enum Suit { bastoni, coppe, denari, spade }
 
-class Card {
+class PlayingCard {
   final int rank;
   final Suit suit;
   final int points;
   final String imagePath;
 
-  Card({required this.rank, required this.suit})
+  PlayingCard({required this.rank, required this.suit})
       : imagePath = 'assets/images/cards/$rank-${suit.name}.png',
         points = _getPoints(rank);
 
@@ -38,11 +38,11 @@ class Card {
       return true;
     }
 
-    if (other is! Card) {
+    if (other is! PlayingCard) {
       return false;
     }
 
-    Card otherCard = other;
+    PlayingCard otherCard = other;
     if (otherCard.rank == rank && otherCard.suit == suit) {
       return true;
     }

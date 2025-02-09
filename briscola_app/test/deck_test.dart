@@ -11,7 +11,7 @@ void main() {
   group('Peeking the last card functions correctly', () {
     test('Peeking method returns a card', () {
       var deck = Deck();
-      expect(deck.peekLastCard, isA<Card>());
+      expect(deck.peekLastCard, isA<PlayingCard>());
     });
 
     test('Peeking a card does not modify deck length', () {
@@ -24,7 +24,7 @@ void main() {
   group('Draw card method works correctly', () {
     test('Drawing a card should return a card', () {
       var deck = Deck();
-      expect(deck.drawTopCard(), isA<Card>());
+      expect(deck.drawTopCard(), isA<PlayingCard>());
     });
 
     test('Should be possible to draw 40 cards', () {

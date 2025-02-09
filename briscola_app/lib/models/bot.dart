@@ -9,7 +9,7 @@ class Bot extends Player {
   Bot(String name) : super(name: name);
 
   @override
-  Future<Card> playCard() async {
+  Future<PlayingCard> playCard() async {
     if (super.cardsInHand == 0) {
       throw StateError('Cannot play cards if the hand is empty');
     }

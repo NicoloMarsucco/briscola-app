@@ -4,13 +4,13 @@ import 'package:flutter/foundation.dart';
 abstract class Player implements Comparable<Player> {
   final String name;
   int _points = 0;
-  final List<Card> _hand = [];
-  final List<Card> _cardsWon = [];
+  final List<PlayingCard> _hand = [];
+  final List<PlayingCard> _cardsWon = [];
 
   Player({required this.name});
 
   @nonVirtual
-  void addCardToHand(Card card) {
+  void addCardToHand(PlayingCard card) {
     if (_hand.length >= 3) {
       throw StateError('A player cannot have more than 3 cards');
     }
@@ -18,8 +18,8 @@ abstract class Player implements Comparable<Player> {
   }
 
   @nonVirtual
-  void collectPlayedCards(Iterable<Card> cardsOnTheTable) {
-    for (Card card in cardsOnTheTable) {
+  void collectPlayedCards(Iterable<PlayingCard> cardsOnTheTable) {
+    for (PlayingCard card in cardsOnTheTable) {
       _points += card.points;
       _cardsWon.add(card);
     }
@@ -32,7 +32,7 @@ abstract class Player implements Comparable<Player> {
   int get cardsInHand => _hand.length;
 
   @nonVirtual
-  List<Card> get viewHand => _hand;
+  List<PlayingCard> get viewHand => _hand;
 
   @override
   @nonVirtual
@@ -41,9 +41,9 @@ abstract class Player implements Comparable<Player> {
   }
 
   @nonVirtual
-  void removeCardFromHand(Card card) {
+  void removeCardFromHand(PlayingCard card) {
     _hand.remove(card);
   }
 
-  Future<Card> playCard();
+  Future<PlayingCard> playCard();
 }
