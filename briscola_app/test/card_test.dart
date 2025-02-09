@@ -24,4 +24,28 @@ void main() {
     var card = Card(rank: 2, suit: Suit.denari);
     expect(card.toString(), '2 of denari');
   });
+
+  group('== operator works correctly', () {
+    test('== should return true if two cards are the same', () {
+      var card1 = Card(rank: 1, suit: Suit.coppe);
+      var card2 = Card(rank: 1, suit: Suit.coppe);
+      expect(card1 == card2, true);
+    });
+
+    test('== should return false if two cards are different', () {
+      var card1 = Card(rank: 4, suit: Suit.coppe);
+      var card2 = Card(rank: 4, suit: Suit.bastoni);
+      expect(card1 == card2, false);
+    });
+  });
+
+  test("Hashcode should not produce duplicated in a deck", () {
+    var hashes = <int>{};
+    for (int rank = 1; rank < 11; rank++) {
+      for (Suit suit in Suit.values) {
+        hashes.add(Card(rank: rank, suit: suit).hashCode);
+      }
+    }
+    expect(hashes.length, 40);
+  });
 }
