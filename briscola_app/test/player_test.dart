@@ -36,6 +36,15 @@ void main() {
     expect(player.points, 15);
   });
 
+  test('Remove card from hand works correctly', () {
+    var player = MockPlayer();
+    player.addCardToHand(Card(rank: 1, suit: Suit.bastoni));
+    player.addCardToHand(Card(rank: 10, suit: Suit.coppe));
+    player.addCardToHand(Card(rank: 2, suit: Suit.denari));
+    player.removeCardFromHand(Card(rank: 2, suit: Suit.denari));
+    expect(player.cardsInHand, 2);
+  });
+
   group("compareTo method should be implemented correctly", () {
     late MockPlayer player1;
     late MockPlayer player2;

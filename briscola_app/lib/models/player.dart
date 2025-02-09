@@ -31,10 +31,18 @@ abstract class Player implements Comparable<Player> {
   @nonVirtual
   int get cardsInHand => _hand.length;
 
+  @nonVirtual
+  List<Card> get viewHand => _hand;
+
   @override
   @nonVirtual
   int compareTo(Player other) {
     return _points.compareTo(other._points);
+  }
+
+  @nonVirtual
+  void removeCardFromHand(Card card) {
+    _hand.remove(card);
   }
 
   Future<Card> playCard();
