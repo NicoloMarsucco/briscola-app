@@ -1,4 +1,4 @@
-import 'package:briscola_app/models/card.dart';
+import 'package:briscola_app/game_internals/playing_card.dart';
 import 'package:test/test.dart';
 
 void main() {

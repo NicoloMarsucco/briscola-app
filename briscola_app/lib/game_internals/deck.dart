@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:briscola_app/models/card.dart';
+import 'package:briscola_app/game_internals/playing_card.dart';
 
 class Deck {
   final _deck = ListQueue<PlayingCard>();

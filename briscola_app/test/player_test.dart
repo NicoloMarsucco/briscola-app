@@ -1,5 +1,5 @@
-import 'package:briscola_app/models/card.dart';
-import 'package:briscola_app/models/player.dart';
+import 'package:briscola_app/game_internals/playing_card.dart';
+import 'package:briscola_app/game_internals/player.dart';
 import 'package:test/test.dart';
 
 class MockPlayer extends Player {

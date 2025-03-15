@@ -7,7 +7,7 @@ class PlayingCard {
   final String imagePath;
 
   PlayingCard({required this.rank, required this.suit})
-      : imagePath = 'assets/images/cards/$rank-${suit.name}.png',
+      : imagePath = 'assets/cards/$rank-${suit.name}.jpg',
         points = _getPoints(rank);
 
   static int _getPoints(int rank) {
@@ -23,7 +23,7 @@ class PlayingCard {
       case 10:
         return 4;
       default:
-        return rank;
+        return 0;
     }
   }
 
