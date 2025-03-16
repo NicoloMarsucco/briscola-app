@@ -12,7 +12,7 @@ class PlayingCardWidget extends StatelessWidget {
   final bool isCardVisible;
   final bool isCardDraggable;
 
-  final PlayingCard card;
+  final PlayingCard? card;
 
   const PlayingCardWidget(
       {required this.card,
@@ -22,6 +22,13 @@ class PlayingCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (card == null) {
+      return SizedBox(
+        height: height,
+        width: width,
+      );
+    }
+
     final cardWidget = DefaultTextStyle(
       style: const TextStyle(fontSize: 16, color: Colors.black),
       child: Container(
@@ -42,7 +49,7 @@ class PlayingCardWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius),
           child: Center(
             child: Image.asset(
-              isCardVisible ? card.imagePath : pathToBackCardImage,
+              isCardVisible ? card!.imagePath : pathToBackCardImage,
               fit: BoxFit.fill,
             ),
           ),
@@ -52,7 +59,7 @@ class PlayingCardWidget extends StatelessWidget {
 
     if (isCardDraggable) {
       return Draggable(
-        data: PlayingCardDragData(card),
+        data: PlayingCardDragData(card!),
         feedback: Transform.rotate(
           angle: 0.1,
           child: cardWidget,

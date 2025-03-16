@@ -1,4 +1,3 @@
-import 'package:briscola_app/game_internals/board_state.dart';
 import 'package:briscola_app/play_session/player_hand_widget.dart';
 import 'package:briscola_app/play_session/player_info_widget.dart';
 import 'package:briscola_app/play_session/playing_area_widget.dart';
@@ -17,9 +16,9 @@ class BoardWidget extends StatefulWidget {
 class _BoardWidgetState extends State<BoardWidget> {
   @override
   Widget build(BuildContext context) {
-    final game = context.watch<Game>();
-    final botPlayer = game.players[0];
-    final humanPlayer = game.players[1];
+    final players = context.watch<Game>().players;
+    final botPlayer = players[0];
+    final humanPlayer = players[1];
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -38,11 +37,6 @@ class _BoardWidgetState extends State<BoardWidget> {
           areCardsDraggable: true,
         ),
         PlayerInfoWidget(player: humanPlayer)
-        /*        Padding(
-          padding: const EdgeInsets.all(10),
-          child: PlayingAreaWidget(boardState.areaOne),
-        ), */
-        //const PlayerHandWidget(),
       ],
     );
   }

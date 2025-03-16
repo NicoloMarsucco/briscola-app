@@ -17,21 +17,19 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: 'play',
-          pageBuilder: (context, state) {
+          builder: (context, state) {
             final botPlayer = Bot(name: 'Bot');
-            final humanPlayer = HumanPlayer(name: 'Nico');
+            final humanPlayer = HumanPlayer(name: 'Bob');
             final game = Game(players: [botPlayer, humanPlayer]);
 
-            return MaterialPage(
-              child: MultiProvider(
-                providers: [
-                  ChangeNotifierProvider.value(value: game),
-                  ChangeNotifierProvider.value(value: botPlayer),
-                  ChangeNotifierProvider.value(value: humanPlayer),
-                  ChangeNotifierProvider.value(value: game.roundManager),
-                ],
-                child: const PlaySessionScreen(),
-              ),
+            return MultiProvider(
+              providers: [
+                ChangeNotifierProvider.value(value: game),
+                ChangeNotifierProvider.value(value: botPlayer),
+                ChangeNotifierProvider.value(value: humanPlayer),
+                ChangeNotifierProvider.value(value: game.roundManager),
+              ],
+              child: const PlaySessionScreen(),
             );
           },
         ),

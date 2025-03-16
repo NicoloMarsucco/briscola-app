@@ -1,18 +1,6 @@
-import 'dart:math';
-
-import 'package:briscola_app/game_internals/playing_card.dart';
 import 'package:briscola_app/game_internals/player.dart';
+import 'package:briscola_app/game_internals/random_strategy.dart';
 
 class Bot extends Player {
-  final _random = Random();
-
-  Bot({required super.name});
-
-  @override
-  Future<PlayingCard> playCard() async {
-    PlayingCard cardToPlay =
-        super.viewHand[_random.nextInt(super.viewHand.length)];
-    super.removeCardFromHand(cardToPlay);
-    return cardToPlay;
-  }
+  Bot({required super.name}) : super(botStrategy: RandomStrategy());
 }

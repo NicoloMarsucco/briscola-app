@@ -1,6 +1,3 @@
-import 'package:briscola_app/game_internals/bot.dart';
-import 'package:briscola_app/game_internals/deck.dart';
-import 'package:briscola_app/game_internals/player.dart';
 import 'package:briscola_app/game_internals/playing_area.dart';
 
 import 'game.dart';

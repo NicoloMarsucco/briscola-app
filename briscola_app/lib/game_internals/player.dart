@@ -1,19 +1,44 @@
+import 'dart:async';
+
+import 'package:briscola_app/game_internals/bot_strategy.dart';
 import 'package:briscola_app/game_internals/playing_card.dart';
 import 'package:flutter/foundation.dart';
 
+import 'game_history.dart';
+
 abstract class Player extends ChangeNotifier implements Comparable<Player> {
   final String name;
+
   int _points = 0;
-  final List<PlayingCard> _hand = [];
+
+  final List<PlayingCard?> _hand =
+      List.filled(maxCardsInHand, null, growable: false);
+
   final List<PlayingCard> _cardsWon = [];
+
+  Completer<PlayingCard> _completer = Completer<PlayingCard>();
+
+  final BotStrategy? _botStrategy;
+
   static const int maxCardsInHand = 3;
 
-  Player({required this.name});
+  Player({required this.name, BotStrategy? botStrategy})
+      : _botStrategy = botStrategy;
+
+  @nonVirtual
+  void subscribePlayerToGameHistory(GameHistory gameHistory) {
+    if (isBot) {
+      _botStrategy!.gameHistory = gameHistory;
+    }
+  }
 
   @nonVirtual
   void addCardToHand(PlayingCard card) {
-    _hand.add(card);
-    notifyListeners();
+    final index = _hand.indexWhere((card) => card == null);
+    if (index >= 0) {
+      _hand[index] = card;
+      notifyListeners();
+    }
   }
 
   @nonVirtual
@@ -28,7 +53,7 @@ abstract class Player extends ChangeNotifier implements Comparable<Player> {
   int get points => _points;
 
   @nonVirtual
-  List<PlayingCard> get viewHand => _hand;
+  List<PlayingCard?> get hand => List.unmodifiable(_hand);
 
   @override
   @nonVirtual
@@ -38,14 +63,44 @@ abstract class Player extends ChangeNotifier implements Comparable<Player> {
 
   @nonVirtual
   void removeCardFromHand(PlayingCard card) {
-    _hand.remove(card);
+    _hand[_hand.indexOf(card)] = null;
     notifyListeners();
   }
-
-  Future<PlayingCard> playCard();
 
   @override
   String toString() {
     return name;
   }
+
+  @nonVirtual
+  Future<PlayingCard> waitForPlayerMove() async {
+    return _completer.future;
+  }
+
+  @nonVirtual
+  void userPlaysCard(PlayingCard card) {
+    if (!_completer.isCompleted) {
+      _completer.complete(card);
+    }
+  }
+
+  @nonVirtual
+  Future<PlayingCard> makeBotChooseCard() {
+    return _botStrategy!.chooseCardToPlay(hand);
+  }
+
+  @nonVirtual
+  void resetCompleter() {
+    if (!isBot) {
+      _completer = Completer<PlayingCard>();
+    }
+  }
+
+  @nonVirtual
+  bool get isHandEmpty {
+    return _hand.every((card) => card == null);
+  }
+
+  @nonVirtual
+  bool get isBot => _botStrategy == null ? false : true;
 }

@@ -1,4 +1,5 @@
 import 'package:briscola_app/game_internals/deck.dart';
+import 'package:briscola_app/game_internals/game_history.dart';
 import 'package:briscola_app/game_internals/round_manager.dart';
 import 'package:flutter/foundation.dart';
 
@@ -6,41 +7,42 @@ import 'player.dart';
 import 'playing_card.dart';
 
 class Game extends ChangeNotifier {
-  static final Game _game = Game._internal();
-  bool isFinished = false;
-
+  final List<Player> _players;
   final Deck deck = Deck();
+  late final GameHistory gameHistory;
   late final Suit suitOfBriscola;
-  final List<Player> players = [];
-  late final RoundManager roundManager;
+  late final RoundManager _roundManager;
+  bool _isFinished = false;
+  bool _isFirstRound = true;
 
-  factory Game({required List<Player> players}) {
-    _game._initialize(players);
-    return _game;
+  Game({required List<Player> players}) : _players = players {
+    suitOfBriscola = deck.peekLastCard.suit;
+    gameHistory = GameHistory(
+        lastCard: deck.peekLastCard, numberOfPlayers: players.length);
+    _subscribeBotsToHistory();
+    _roundManager = RoundManager(game: this);
   }
 
-  Game._internal();
-
-  void _initialize(List<Player> lisOfPlayers) {
-    if (!_isGameInitialized()) {
-      players.addAll(lisOfPlayers);
-      suitOfBriscola = deck.peekLastCard.suit;
-      roundManager = RoundManager(game: this);
-    }
-
-    _startGame();
-  }
-
-  void _startGame() {
-    roundManager.startRound();
-  }
-
-  bool _isGameInitialized() {
-    try {
-      suitOfBriscola;
-      return true;
-    } catch (e) {
-      return false;
+  void _subscribeBotsToHistory() {
+    for (Player player in players) {
+      if (player.isBot) {
+        player.subscribePlayerToGameHistory(gameHistory);
+      }
     }
   }
+
+  List<Player> get players => List.unmodifiable(_players);
+
+  RoundManager get roundManager => _roundManager;
+
+  Future<void> startGame() async {
+    while (!_players.first.isHandEmpty || _isFirstRound) {
+      await _roundManager.startRound();
+      _isFirstRound = false;
+    }
+    _isFinished = true;
+    notifyListeners();
+  }
+
+  bool get isFinished => _isFinished;
 }
