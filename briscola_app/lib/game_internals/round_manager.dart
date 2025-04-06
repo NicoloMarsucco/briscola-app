@@ -12,6 +12,7 @@ class RoundManager extends ChangeNotifier {
   final List<PlayingCard> _cardsOnTheTable = [];
   PlayingCard? _strongestCardOnTheTable;
   late Player _holderOfStrongestCard;
+  RoundPhase _phase = RoundPhase.distribution;
 
   final Logger _log = Logger("Round Manager");
 
@@ -27,6 +28,7 @@ class RoundManager extends ChangeNotifier {
   }
 
   void _distributeCards() {
+    _phase = RoundPhase.distribution;
     if (_game.deck.cardsLeft < _game.players.length) {
       return;
     }
@@ -39,6 +41,7 @@ class RoundManager extends ChangeNotifier {
   }
 
   Future<void> _letPlayersMakeTheirPlay() async {
+    _phase = RoundPhase.play;
     final indexOfStartingPlayer = _game.players.indexOf(_holderOfStrongestCard);
 
     for (int i = 0; i < _game.players.length; i++) {
@@ -98,6 +101,7 @@ class RoundManager extends ChangeNotifier {
   }
 
   void _collectCards() {
+    _phase = RoundPhase.collection;
     _holderOfStrongestCard.collectPlayedCards(_cardsOnTheTable);
     _cardsOnTheTable.clear();
     _strongestCardOnTheTable = null;
@@ -111,4 +115,10 @@ class RoundManager extends ChangeNotifier {
       player.resetCompleter();
     }
   }
+
+  RoundPhase get phase => _phase;
+
+  Player get startingPlayer => _holderOfStrongestCard;
 }
+
+enum RoundPhase { distribution, play, collection }
