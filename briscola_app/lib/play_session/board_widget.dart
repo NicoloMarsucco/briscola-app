@@ -26,6 +26,8 @@ class _BoardWidgetState extends State<BoardWidget> {
   final Set<PlayingCard> _cardsShown = {};
   bool _isDistributing = false;
 
+  RoundPhase _currentPhase = RoundPhase.distribution;
+
   void _distributeCards(
       {required List<PlayingCard?> backendBotHand,
       required List<PlayingCard?> backendHumanHand,
@@ -73,6 +75,21 @@ class _BoardWidgetState extends State<BoardWidget> {
         await Future.delayed(delayBetweenCards);
       }
     }
+    _isDistributing = false;
+    setState(() {
+      _updatePhase();
+    });
+  }
+
+  void _updatePhase() {
+    switch (_currentPhase) {
+      case RoundPhase.distribution:
+        _currentPhase = RoundPhase.play;
+      case RoundPhase.play:
+        _currentPhase = RoundPhase.collection;
+      case RoundPhase.collection:
+        _currentPhase = RoundPhase.distribution;
+    }
   }
 
   static List<PlayerType> _getDistributionOrder(PlayerType type) {
@@ -83,6 +100,15 @@ class _BoardWidgetState extends State<BoardWidget> {
 
   PlayerType _determineFirstPlayerType(Player firstPlayer) {
     return firstPlayer is Bot ? PlayerType.bot : PlayerType.human;
+  }
+
+  void _playBotCard(PlayingCard card, CardPositions positions) {
+    final cardWidget = _cardsWidgetsCreated.firstWhere((c) => c.card == card);
+    final target = positions.getCurrentPosition(BoardLocations.table);
+    setState(() {
+      cardWidget.position = target;
+      cardWidget.controller.flipcard();
+    });
   }
 
   @override
@@ -96,11 +122,16 @@ class _BoardWidgetState extends State<BoardWidget> {
         height: MediaQuery.sizeOf(context).height,
         width: MediaQuery.sizeOf(context).width);
 
-    _distributeCards(
-        startingPlayer: _determineFirstPlayerType(round.startingPlayer),
-        backendBotHand: botPlayer.hand,
-        backendHumanHand: humanPlayer.hand,
-        cardPositions: positions);
+    if (_currentPhase == RoundPhase.distribution) {
+      _distributeCards(
+          startingPlayer: _determineFirstPlayerType(round.startingPlayer),
+          backendBotHand: botPlayer.hand,
+          backendHumanHand: humanPlayer.hand,
+          cardPositions: positions);
+    } else if (_currentPhase == RoundPhase.play &&
+        _determineFirstPlayerType(round.startingPlayer) == PlayerType.bot) {
+      _playBotCard(round.cardsOnTheTable.first, positions);
+    }
 
     return Stack(
       children: [

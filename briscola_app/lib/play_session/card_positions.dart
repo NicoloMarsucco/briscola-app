@@ -36,7 +36,8 @@ class CardPositions {
   }
 
   void _addTablePosition() {
-    final horizontalDistance = width - horizontalPaddingDeck;
+    final horizontalDistance =
+        width - horizontalPaddingDeck - PlayingCardWidget.width;
     final middle = height / 2;
     _cardLocations[BoardLocations.table] = [
       Position(
