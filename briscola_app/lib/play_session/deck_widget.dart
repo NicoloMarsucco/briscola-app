@@ -24,16 +24,14 @@ class DeckWidget extends StatelessWidget {
               angle: pi / 2,
               child: PlayingCardWidget(
                 card: game.deck.peekLastCard,
-                isCardVisible: true,
-                isCardDraggable: false,
+                cardType: CardType.briscola,
               ),
             ),
           ),
         if (game.deck.cardsLeft >= 2)
           PlayingCardWidget(
             card: PlayingCard(rank: 1, suit: Suit.bastoni),
-            isCardVisible: false,
-            isCardDraggable: false,
+            cardType: CardType.deck,
           )
       ],
     );

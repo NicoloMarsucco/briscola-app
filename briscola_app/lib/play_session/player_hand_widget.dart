@@ -28,11 +28,8 @@ class PlayerHandWidget extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            ...player.hand.map((card) => PlayingCardWidget(
-                  card: card,
-                  isCardVisible: showCards,
-                  isCardDraggable: areCardsDraggable,
-                )),
+            ...player.hand.map((card) =>
+                PlayingCardWidget(card: card, cardType: CardType.briscola)),
           ],
         ),
       ),

@@ -39,6 +39,7 @@ dependencies:
   go_router: ^14.8.0
   async: ^2.11.0
   tuple: ^2.0.2
+  flutter_flip_card: ^0.0.6
 
 dev_dependencies:
   flutter_test:

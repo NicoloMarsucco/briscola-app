@@ -7,6 +7,7 @@ import 'package:briscola_app/play_session/card_positions_controller.dart';
 import 'package:briscola_app/play_session/deck_widget.dart';
 import 'package:briscola_app/play_session/moving_card_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flip_card/controllers/flip_card_controllers.dart';
 import 'package:provider/provider.dart';
 
 import '../game_internals/game.dart';
@@ -65,6 +66,10 @@ class _BoardWidgetState extends State<BoardWidget> {
           cardData.position = targetPosition;
         });
 
+        if (type == PlayerType.human) {
+          cardData.controller.flipcard();
+        }
+
         await Future.delayed(delayBetweenCards);
       }
     }
@@ -106,7 +111,10 @@ class _BoardWidgetState extends State<BoardWidget> {
           child: DeckWidget(),
         ),
         ..._cardsWidgetsCreated.map((card) => MovingCardWidget(
-            position: card.position, card: card.card, key: card.key))
+            position: card.position,
+            card: card.card,
+            controller: card.controller,
+            key: card.key))
       ],
     );
   }
@@ -115,8 +123,8 @@ class _BoardWidgetState extends State<BoardWidget> {
 class MovingCardData {
   final PlayingCard card;
   Position position;
-  final bool isVisible = false;
   final Key key;
+  final FlipCardController controller = FlipCardController();
 
   MovingCardData({required this.card, required this.position})
       : key = ValueKey(card.toString());
