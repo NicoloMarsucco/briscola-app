@@ -26,6 +26,8 @@ class _BoardWidgetState extends State<BoardWidget> {
   final Set<PlayingCard> _cardsShown = {};
   bool _isDistributing = false;
 
+  bool _isWaitingForUserInput = false;
+
   RoundPhase _currentPhase = RoundPhase.distribution;
 
   void _distributeCards(
@@ -56,6 +58,7 @@ class _BoardWidgetState extends State<BoardWidget> {
         final cardData = MovingCardData(
           card: card,
           position: initialPosition,
+          isTappable: type == PlayerType.human,
         );
 
         _cardsWidgetsCreated.add(cardData);
@@ -102,12 +105,16 @@ class _BoardWidgetState extends State<BoardWidget> {
     return firstPlayer is Bot ? PlayerType.bot : PlayerType.human;
   }
 
-  void _playBotCard(PlayingCard card, CardPositions positions) {
+  void _playCard(PlayingCard card, CardPositions positions, PlayerType type) {
     final cardWidget = _cardsWidgetsCreated.firstWhere((c) => c.card == card);
-    final target = positions.getCurrentPosition(BoardLocations.table);
+    final index = type == PlayerType.bot ? 0 : 1;
+    final target = positions.getCurrentPosition(BoardLocations.table, index);
+    _isWaitingForUserInput = true;
     setState(() {
       cardWidget.position = target;
-      cardWidget.controller.flipcard();
+      if (type == PlayerType.bot) {
+        cardWidget.controller.flipcard();
+      }
     });
   }
 
@@ -129,8 +136,9 @@ class _BoardWidgetState extends State<BoardWidget> {
           backendHumanHand: humanPlayer.hand,
           cardPositions: positions);
     } else if (_currentPhase == RoundPhase.play &&
-        _determineFirstPlayerType(round.startingPlayer) == PlayerType.bot) {
-      _playBotCard(round.cardsOnTheTable.first, positions);
+        _determineFirstPlayerType(round.startingPlayer) == PlayerType.bot &&
+        !_isWaitingForUserInput) {
+      _playCard(round.cardsOnTheTable.first, positions, PlayerType.bot);
     }
 
     return Stack(
@@ -145,6 +153,11 @@ class _BoardWidgetState extends State<BoardWidget> {
             position: card.position,
             card: card.card,
             controller: card.controller,
+            onTap: () {
+              if (card.isTappable && round.isWaitingForInput) {
+                _playCard(card.card, positions, PlayerType.human);
+              }
+            },
             key: card.key))
       ],
     );
@@ -156,7 +169,9 @@ class MovingCardData {
   Position position;
   final Key key;
   final FlipCardController controller = FlipCardController();
+  final bool isTappable;
 
-  MovingCardData({required this.card, required this.position})
+  MovingCardData(
+      {required this.card, required this.position, required this.isTappable})
       : key = ValueKey(card.toString());
 }

@@ -10,12 +10,14 @@ class MovingCardWidget extends StatelessWidget {
   static const Duration duration = Duration(milliseconds: 600);
   final PlayingCard card;
   final FlipCardController controller;
+  final VoidCallback? onTap;
 
   MovingCardWidget({
     required this.position,
     required this.card,
     required this.controller,
     required Key key,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -25,10 +27,13 @@ class MovingCardWidget extends StatelessWidget {
       left: position.left,
       duration: duration,
       curve: curve,
-      child: PlayingCardWidget(
-        card: card,
-        cardType: CardType.player,
-        controller: controller,
+      child: GestureDetector(
+        onTap: onTap,
+        child: PlayingCardWidget(
+          card: card,
+          cardType: CardType.player,
+          controller: controller,
+        ),
       ),
     );
   }

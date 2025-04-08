@@ -52,7 +52,7 @@ class PlayingCardWidget extends StatelessWidget {
 
   Widget _getFlippableCard() {
     return FlipCard(
-      onTapFlipping: true,
+      onTapFlipping: false,
       frontWidget: _getFrontOrBackCards(false),
       backWidget: _getFrontOrBackCards(true),
       controller: controller!,

@@ -14,6 +14,8 @@ class RoundManager extends ChangeNotifier {
   late Player _holderOfStrongestCard;
   RoundPhase _phase = RoundPhase.distribution;
 
+  bool _isWaitingForUserInput = false;
+
   final Logger _log = Logger("Round Manager");
 
   RoundManager({required Game game}) : _game = game {
@@ -52,7 +54,11 @@ class RoundManager extends ChangeNotifier {
       if (currentPlayer.isBot) {
         cardPlayed = await currentPlayer.makeBotChooseCard();
       } else {
+        _isWaitingForUserInput = true;
+        notifyListeners();
         cardPlayed = await currentPlayer.waitForPlayerMove();
+        _isWaitingForUserInput = false;
+        notifyListeners();
       }
       currentPlayer.removeCardFromHand(cardPlayed);
       _log.info("${currentPlayer.name} played $cardPlayed");
@@ -119,6 +125,8 @@ class RoundManager extends ChangeNotifier {
   RoundPhase get phase => _phase;
 
   Player get startingPlayer => _holderOfStrongestCard;
+
+  bool get isWaitingForInput => _isWaitingForUserInput;
 }
 
 enum RoundPhase { distribution, play, collection }
