@@ -3,7 +3,6 @@ import 'package:briscola_app/game_internals/game.dart';
 import 'package:briscola_app/game_internals/human_player.dart';
 import 'package:briscola_app/main_menu/main_menu_screen.dart';
 import 'package:briscola_app/play_session/play_session_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -22,15 +21,10 @@ final router = GoRouter(
             final humanPlayer = HumanPlayer(name: 'Bob');
             final game = Game(players: [botPlayer, humanPlayer]);
 
-            return MultiProvider(
-              providers: [
-                ChangeNotifierProvider.value(value: game),
-                ChangeNotifierProvider.value(value: botPlayer),
-                ChangeNotifierProvider.value(value: humanPlayer),
-                ChangeNotifierProvider.value(value: game.roundManager),
-              ],
-              child: const PlaySessionScreen(),
-            );
+            return MultiProvider(providers: [
+              ChangeNotifierProvider.value(
+                  value: game.roundManager.playScreenAnimationController),
+            ], child: PlaySessionScreen(game: game));
           },
         ),
       ],

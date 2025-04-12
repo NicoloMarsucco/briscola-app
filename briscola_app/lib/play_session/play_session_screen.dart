@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class PlaySessionScreen extends StatefulWidget {
-  const PlaySessionScreen({super.key});
+  final Game _game;
+
+  PlaySessionScreen({super.key, required Game game}) : _game = game {
+    _game.startGame();
+  }
 
   @override
   State<PlaySessionScreen> createState() => _PlaySessionScreenState();
@@ -14,20 +18,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [BoardWidget()],
-        ),
-      ),
+      body: BoardWidget(),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    final game = Provider.of<Game>(context, listen: false);
-    game.startGame();
   }
 }

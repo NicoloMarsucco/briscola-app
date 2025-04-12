@@ -1,12 +1,10 @@
 import 'package:briscola_app/game_internals/deck.dart';
 import 'package:briscola_app/game_internals/game_history.dart';
 import 'package:briscola_app/game_internals/round_manager.dart';
-import 'package:flutter/foundation.dart';
-
 import 'player.dart';
 import 'playing_card.dart';
 
-class Game extends ChangeNotifier {
+class Game {
   final List<Player> _players;
   final Deck deck = Deck();
   late final GameHistory gameHistory;
@@ -41,7 +39,6 @@ class Game extends ChangeNotifier {
       _isFirstRound = false;
     }
     _isFinished = true;
-    notifyListeners();
   }
 
   bool get isFinished => _isFinished;

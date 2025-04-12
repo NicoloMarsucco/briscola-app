@@ -1,7 +1,6 @@
-import 'package:briscola_app/game_internals/human_player.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flip_card/flutter_flip_card.dart';
 
-import '../game_internals/player.dart';
 import '../game_internals/playing_card.dart';
 
 class PlayingCardWidget extends StatelessWidget {
@@ -9,16 +8,28 @@ class PlayingCardWidget extends StatelessWidget {
   static const double height = 109.25;
   static const double borderRadius = 5;
   static const String pathToBackCardImage = "assets/cards/card-back.jpg";
-  final bool isCardVisible;
-  final bool isCardDraggable;
+  final CardType cardType;
+
+  //Shadows
+  static const Color _shadowColor = Colors.black26;
+  static const double _blurRadius = 4;
+  static const Offset _shadowOffset = Offset(2, 2);
+
+  //Rotation
+  final FlipCardController? controller;
+  static const Duration _rotationDuration = Duration(milliseconds: 300);
 
   final PlayingCard? card;
 
-  const PlayingCardWidget(
+  PlayingCardWidget(
       {required this.card,
-      required this.isCardVisible,
-      required this.isCardDraggable,
-      super.key});
+      required this.cardType,
+      this.controller,
+      super.key}) {
+    if (cardType == CardType.player) {
+      assert(controller != null);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,52 +40,56 @@ class PlayingCardWidget extends StatelessWidget {
       );
     }
 
-    final cardWidget = DefaultTextStyle(
-      style: const TextStyle(fontSize: 16, color: Colors.black),
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(borderRadius),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 4,
-              offset: Offset(2, 2),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(borderRadius),
-          child: Center(
-            child: Image.asset(
-              isCardVisible ? card!.imagePath : pathToBackCardImage,
-              fit: BoxFit.fill,
-            ),
+    switch (cardType) {
+      case CardType.deck:
+        return _getFrontOrBackCards(false);
+      case CardType.briscola:
+        return _getFrontOrBackCards(true);
+      default:
+        return _getFlippableCard();
+    }
+  }
+
+  Widget _getFlippableCard() {
+    return FlipCard(
+      onTapFlipping: false,
+      frontWidget: _getFrontOrBackCards(false),
+      backWidget: _getFrontOrBackCards(true),
+      controller: controller!,
+      rotateSide: RotateSide.right,
+      animationDuration: _rotationDuration,
+    );
+  }
+
+  Widget _getFrontOrBackCards(bool isFront) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(borderRadius),
+        boxShadow: [
+          BoxShadow(
+            color: _shadowColor,
+            blurRadius: _blurRadius,
+            offset: _shadowOffset,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Center(
+          child: Image.asset(
+            isFront ? card!.imagePath : pathToBackCardImage,
+            fit: BoxFit.fill,
           ),
         ),
       ),
     );
-
-    if (isCardDraggable) {
-      return Draggable(
-        data: PlayingCardDragData(card!),
-        feedback: Transform.rotate(
-          angle: 0.1,
-          child: cardWidget,
-        ),
-        childWhenDragging: Opacity(
-          opacity: 0.5,
-          child: cardWidget,
-        ),
-        child: cardWidget,
-      );
-    } else {
-      return cardWidget;
-    }
   }
 }
+
+enum CardType { briscola, deck, player }
 
 @immutable
 class PlayingCardDragData {
