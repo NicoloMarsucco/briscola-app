@@ -21,17 +21,10 @@ final router = GoRouter(
             final humanPlayer = HumanPlayer(name: 'Bob');
             final game = Game(players: [botPlayer, humanPlayer]);
 
-            return MultiProvider(
-              providers: [
-                ChangeNotifierProvider.value(value: game),
-                ChangeNotifierProvider.value(value: botPlayer),
-                ChangeNotifierProvider.value(value: humanPlayer),
-                ChangeNotifierProvider.value(value: game.roundManager),
-                ChangeNotifierProvider.value(
-                    value: game.roundManager.playScreenAnimationController),
-              ],
-              child: const PlaySessionScreen(),
-            );
+            return MultiProvider(providers: [
+              ChangeNotifierProvider.value(
+                  value: game.roundManager.playScreenAnimationController),
+            ], child: PlaySessionScreen(game: game));
           },
         ),
       ],

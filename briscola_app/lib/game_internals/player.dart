@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 
 import 'game_history.dart';
 
-abstract class Player extends ChangeNotifier implements Comparable<Player> {
+abstract class Player implements Comparable<Player> {
   final String name;
 
   int _points = 0;
@@ -15,8 +15,6 @@ abstract class Player extends ChangeNotifier implements Comparable<Player> {
       List.filled(maxCardsInHand, null, growable: false);
 
   final List<PlayingCard> _cardsWon = [];
-
-  Completer<PlayingCard> _completer = Completer<PlayingCard>();
 
   final BotStrategy? _botStrategy;
 
@@ -37,7 +35,6 @@ abstract class Player extends ChangeNotifier implements Comparable<Player> {
     final index = _hand.indexWhere((card) => card == null);
     if (index >= 0) {
       _hand[index] = card;
-      notifyListeners();
     }
   }
 
@@ -64,7 +61,6 @@ abstract class Player extends ChangeNotifier implements Comparable<Player> {
   @nonVirtual
   void removeCardFromHand(PlayingCard card) {
     _hand[_hand.indexOf(card)] = null;
-    notifyListeners();
   }
 
   @override
@@ -73,27 +69,8 @@ abstract class Player extends ChangeNotifier implements Comparable<Player> {
   }
 
   @nonVirtual
-  Future<PlayingCard> waitForPlayerMove() async {
-    return _completer.future;
-  }
-
-  @nonVirtual
-  void userPlaysCard(PlayingCard card) {
-    if (!_completer.isCompleted) {
-      _completer.complete(card);
-    }
-  }
-
-  @nonVirtual
   Future<PlayingCard> makeBotChooseCard() {
     return _botStrategy!.chooseCardToPlay(hand);
-  }
-
-  @nonVirtual
-  void resetCompleter() {
-    if (!isBot) {
-      _completer = Completer<PlayingCard>();
-    }
   }
 
   @nonVirtual

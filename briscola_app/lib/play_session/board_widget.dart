@@ -50,7 +50,8 @@ class _BoardWidgetState extends State<BoardWidget> {
     }
     _isDistributing = true;
     final deckPosition = _positions.getPosition(BoardLocations.deck);
-    final orderderPlayers = context.read<RoundManager>().orderedPlayers;
+    final orderderPlayers =
+        context.read<PlayScreenAnimationController>().orderedPlayers;
     final completer =
         context.read<PlayScreenAnimationController>().distributionCompleter;
     final numberOfCardsToDistribute =
@@ -203,7 +204,10 @@ class _BoardWidgetState extends State<BoardWidget> {
         Positioned(
           top: _positions.getPosition(BoardLocations.deck).top,
           left: _positions.getPosition(BoardLocations.deck).left,
-          child: DeckWidget(),
+          child: DeckWidget(
+              briscola: context.read<PlayScreenAnimationController>().briscola,
+              showDeck: context.read<PlayScreenAnimationController>().showDeck,
+              key: ValueKey("deck")),
         ),
         ..._cardsWidgetsCreated.map((card) => MovingCardWidget(
             position: card.position,

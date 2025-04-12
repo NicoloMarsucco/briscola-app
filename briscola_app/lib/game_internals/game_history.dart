@@ -1,10 +1,9 @@
 // Class to record the history of the game
 import 'package:briscola_app/game_internals/player.dart';
 import 'package:briscola_app/game_internals/playing_card.dart';
-import 'package:flutter/material.dart';
 import 'package:tuple/tuple.dart';
 
-class GameHistory extends ChangeNotifier {
+class GameHistory {
   final List<Tuple2<Player, PlayingCard>> _history = [];
   final PlayingCard lastCard;
   final int numberOfPlayers;

@@ -2,14 +2,13 @@ import 'dart:async';
 import 'package:briscola_app/game_internals/bot.dart';
 import 'package:briscola_app/game_internals/ordered_players.dart';
 import 'package:briscola_app/play_session/play_screen_animation_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 import 'game.dart';
 import 'player.dart';
 import 'playing_card.dart';
 
-class RoundManager extends ChangeNotifier {
+class RoundManager {
   final Game _game;
 
   final List<PlayingCard> _cardsOnTheTable = [];
@@ -17,13 +16,15 @@ class RoundManager extends ChangeNotifier {
   late Player _holderOfStrongestCard;
 
   final OrderedPlayers _orderedPlayers;
-  final _playScreenAnimationController = PlayScreenAnimationController();
+  final PlayScreenAnimationController _playScreenAnimationController;
 
   final Logger _log = Logger("Round Manager");
 
   RoundManager({required Game game})
       : _game = game,
-        _orderedPlayers = OrderedPlayers(players: game.players) {
+        _orderedPlayers = OrderedPlayers(players: game.players),
+        _playScreenAnimationController =
+            PlayScreenAnimationController(briscola: game.deck.peekLastCard) {
     _holderOfStrongestCard = _game.players.first;
   }
 
@@ -32,12 +33,14 @@ class RoundManager extends ChangeNotifier {
     await _distributeCards();
     await _letPlayersMakeTheirPlay();
     await _collectCards();
-    _resetCompleters();
   }
 
   Future<void> _distributeCards() async {
     if (_game.deck.cardsLeft < _game.players.length) {
       return;
+    }
+    if (_game.deck.cardsLeft / _game.players.length == 1) {
+      _playScreenAnimationController.hideDeck();
     }
     int cardsToDistribute = 0;
     for (Player player in _game.players) {
@@ -46,7 +49,8 @@ class RoundManager extends ChangeNotifier {
         cardsToDistribute++;
       }
     }
-    await _playScreenAnimationController.distributeCards(cardsToDistribute);
+    await _playScreenAnimationController.distributeCards(
+        cardsToDistribute, orderedPlayers);
   }
 
   Future<void> _letPlayersMakeTheirPlay() async {
@@ -75,7 +79,6 @@ class RoundManager extends ChangeNotifier {
     if (_isStrongestCardOnTheTable(card)) {
       _updateDetailsOfStrongestCard(card, player);
     }
-    notifyListeners();
   }
 
   bool _isStrongestCardOnTheTable(PlayingCard card) {
@@ -115,12 +118,6 @@ class RoundManager extends ChangeNotifier {
   }
 
   List<PlayingCard> get cardsOnTheTable => List.unmodifiable(_cardsOnTheTable);
-
-  void _resetCompleters() {
-    for (Player player in _game.players) {
-      player.resetCompleter();
-    }
-  }
 
   Player get startingPlayer => _holderOfStrongestCard;
 

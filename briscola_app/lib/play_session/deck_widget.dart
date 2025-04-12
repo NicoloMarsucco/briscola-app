@@ -1,20 +1,20 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 import 'playing_card_widget.dart';
-import '../game_internals/game.dart';
 import '../game_internals/playing_card.dart';
 
 class DeckWidget extends StatelessWidget {
+  final PlayingCard briscola;
+  final bool showDeck;
+
+  const DeckWidget({super.key, required this.briscola, required this.showDeck});
+
   @override
   Widget build(BuildContext context) {
-    final game = context.watch<Game>();
-
     return Stack(
       children: [
-        if (game.deck.cardsLeft >= 1)
+        if (showDeck)
           Transform.translate(
             offset: const Offset(
                 (PlayingCardWidget.height - PlayingCardWidget.width) * 0.5 +
@@ -23,14 +23,14 @@ class DeckWidget extends StatelessWidget {
             child: Transform.rotate(
               angle: pi / 2,
               child: PlayingCardWidget(
-                card: game.deck.peekLastCard,
+                card: briscola,
                 cardType: CardType.briscola,
               ),
             ),
           ),
-        if (game.deck.cardsLeft >= 2)
+        if (showDeck)
           PlayingCardWidget(
-            card: PlayingCard(rank: 1, suit: Suit.bastoni),
+            card: PlayingCard.dummyCard,
             cardType: CardType.deck,
           )
       ],
