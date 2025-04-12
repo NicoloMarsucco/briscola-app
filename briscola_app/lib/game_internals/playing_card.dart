@@ -5,6 +5,9 @@ class PlayingCard {
   final Suit suit;
   final int points;
   final String imagePath;
+  static final dummyCard = PlayingCard(
+      rank: 0,
+      suit: Suit.bastoni); // A dummy card useful for initilaizing stuff
 
   PlayingCard({required this.rank, required this.suit})
       : imagePath = 'assets/cards/$rank-${suit.name}.jpg',
