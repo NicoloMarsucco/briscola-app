@@ -9,6 +9,7 @@ class RandomStrategy extends BotStrategy {
 
   @override
   Future<PlayingCard> chooseCardToPlay(List<PlayingCard?> hand) async {
+    await Future.delayed(const Duration(milliseconds: 500));
     final availableCards = hand.whereType<PlayingCard>().toList();
     return availableCards[_random.nextInt(availableCards.length)];
   }

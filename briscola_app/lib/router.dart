@@ -28,6 +28,8 @@ final router = GoRouter(
                 ChangeNotifierProvider.value(value: botPlayer),
                 ChangeNotifierProvider.value(value: humanPlayer),
                 ChangeNotifierProvider.value(value: game.roundManager),
+                ChangeNotifierProvider.value(
+                    value: game.roundManager.cardDistributionProvider),
               ],
               child: const PlaySessionScreen(),
             );

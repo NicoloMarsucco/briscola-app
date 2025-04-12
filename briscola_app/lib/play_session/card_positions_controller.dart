@@ -1,43 +1,42 @@
 // Class which tells us where each card should go
+import 'package:briscola_app/game_internals/human_player.dart';
 import 'package:briscola_app/game_internals/playing_card.dart';
 import 'package:briscola_app/play_session/card_positions.dart';
 
+import '../game_internals/bot.dart';
 import '../game_internals/player.dart';
 
 class CardPositionsController {
-  final Map<PlayerType, List<PlayingCard?>> _handsCardShown = {};
-  final Map<PlayerType, Set<PlayingCard>> _cardsDistributed = {};
+  final List<PlayingCard?> _botHandShown =
+      List.filled(Player.maxCardsInHand, null);
+  final List<PlayingCard?> _humanHandShown =
+      List.filled(Player.maxCardsInHand, null);
+  final Set<PlayingCard> _cardsDistributed = {};
 
-  CardPositionsController() {
-    _initializeHandCardsShown();
-    _initializeCardsDistributedSet();
+  CardPositionsController();
+
+  bool isAlreadyDistributed(PlayingCard card) {
+    return _cardsDistributed.contains(card);
   }
 
-  void _initializeHandCardsShown() {
-    for (PlayerType playerType in PlayerType.values) {
-      _handsCardShown.putIfAbsent(playerType, () => []);
-      _handsCardShown[playerType] = List.filled(Player.maxCardsInHand, null);
-    }
-  }
-
-  void _initializeCardsDistributedSet() {
-    for (PlayerType type in PlayerType.values) {
-      _cardsDistributed.putIfAbsent(type, () => {});
-    }
-  }
-
-  bool isAlreadyDistributed(PlayerType type, PlayingCard card) {
-    return _cardsDistributed[type]!.contains(card);
-  }
-
-  PositionKey whereToDistributeCards(PlayerType type, PlayingCard card) {
-    int index = _handsCardShown[type]!.indexOf(null);
-    BoardLocations location = type == PlayerType.human
+  PositionKey whereToDistributeCards(Player player, PlayingCard card) {
+    final targetArray = player is Bot ? _botHandShown : _humanHandShown;
+    final index = targetArray.indexOf(null);
+    targetArray[index] = card;
+    _cardsDistributed.add(card);
+    final location = player is HumanPlayer
         ? BoardLocations.southPlayerHand
         : BoardLocations.northPlayerHand;
-    _handsCardShown[type]![index] = card;
-    _cardsDistributed[type]!.add(card);
     return PositionKey(boardLocation: location, index: index);
+  }
+
+  void freeHandSpot(Player player, PlayingCard card) {
+    final targetHand = player is Bot ? _botHandShown : _humanHandShown;
+    final index = targetHand.indexOf(card);
+    if (index >= 0) {
+      targetHand[index] = null;
+    }
+    _cardsDistributed.remove(card);
   }
 }
 

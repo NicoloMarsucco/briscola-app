@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:briscola_app/game_internals/ordered_players.dart';
+import 'package:briscola_app/play_session/card_distribution_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
@@ -16,30 +18,40 @@ class RoundManager extends ChangeNotifier {
 
   bool _isWaitingForUserInput = false;
 
+  final OrderedPlayers _orderedPlayers;
+
+  final CardDistributionProvider _cardDistributionProvider =
+      CardDistributionProvider();
+
   final Logger _log = Logger("Round Manager");
 
-  RoundManager({required Game game}) : _game = game {
+  RoundManager({required Game game})
+      : _game = game,
+        _orderedPlayers = OrderedPlayers(players: game.players) {
     _holderOfStrongestCard = _game.players.first;
   }
 
   Future<void> startRound() async {
-    _distributeCards();
+    _log.info("---- New round ----");
+    await _distributeCards();
     await _letPlayersMakeTheirPlay();
     _collectCards();
     _resetCompleters();
   }
 
-  void _distributeCards() {
+  Future<void> _distributeCards() async {
     _phase = RoundPhase.distribution;
     if (_game.deck.cardsLeft < _game.players.length) {
       return;
     }
+    int cardsToDistribute = 0;
     for (Player player in _game.players) {
       while (player.hand.contains(null)) {
         player.addCardToHand(_game.deck.drawTopCard());
+        cardsToDistribute++;
       }
     }
-    notifyListeners();
+    await _cardDistributionProvider.distributeCards(cardsToDistribute);
   }
 
   Future<void> _letPlayersMakeTheirPlay() async {
@@ -102,8 +114,6 @@ class RoundManager extends ChangeNotifier {
   void _updateDetailsOfStrongestCard(PlayingCard card, Player player) {
     _strongestCardOnTheTable = card;
     _holderOfStrongestCard = player;
-    _log.info(
-        "Strongest card is now $_strongestCardOnTheTable played by $_holderOfStrongestCard");
   }
 
   void _collectCards() {
@@ -127,6 +137,13 @@ class RoundManager extends ChangeNotifier {
   Player get startingPlayer => _holderOfStrongestCard;
 
   bool get isWaitingForInput => _isWaitingForUserInput;
+
+  CardDistributionProvider get cardDistributionProvider =>
+      _cardDistributionProvider;
+
+  List<Player> get orderedPlayers {
+    return _orderedPlayers.getOrderedPlayers(_holderOfStrongestCard);
+  }
 }
 
 enum RoundPhase { distribution, play, collection }

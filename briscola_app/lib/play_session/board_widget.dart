@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:briscola_app/game_internals/bot.dart';
+import 'package:briscola_app/game_internals/human_player.dart';
 import 'package:briscola_app/game_internals/player.dart';
 import 'package:briscola_app/game_internals/playing_card.dart';
 import 'package:briscola_app/game_internals/round_manager.dart';
+import 'package:briscola_app/play_session/card_distribution_provider.dart';
 import 'package:briscola_app/play_session/card_positions.dart';
 import 'package:briscola_app/play_session/card_positions_controller.dart';
 import 'package:briscola_app/play_session/deck_widget.dart';
@@ -20,69 +24,146 @@ class BoardWidget extends StatefulWidget {
 }
 
 class _BoardWidgetState extends State<BoardWidget> {
+  final CardPositions _positions = CardPositions();
   final CardPositionsController _positionController = CardPositionsController();
 
   final List<MovingCardData> _cardsWidgetsCreated = [];
-  final Set<PlayingCard> _cardsShown = {};
   bool _isDistributing = false;
+  bool _isCollecting = false;
+  bool _isPlaying = false;
 
-  bool _isWaitingForUserInput = false;
+  bool _hasUserPlayed = false;
+  bool _hasBotPlayed = false;
+  bool _hasInitializedPositions = false;
+  final List<MovingCardData> _cardsOnTheTable = [];
 
   RoundPhase _currentPhase = RoundPhase.distribution;
 
-  void _distributeCards(
-      {required List<PlayingCard?> backendBotHand,
-      required List<PlayingCard?> backendHumanHand,
-      required CardPositions cardPositions,
-      required PlayerType startingPlayer}) async {
-    const delayBetweenCards = Duration(milliseconds: 200);
-    const timeForCardToBuild = Duration(milliseconds: 50);
-    final initialPosition =
-        cardPositions.getCurrentPosition(BoardLocations.deck);
+  // Animation times
+  static const _timeForCardToBuild = Duration(milliseconds: 50);
+  static const _pauseBetweenCardsDistribution = Duration(milliseconds: 200);
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_hasInitializedPositions) {
+      _positions.initialize(context); // Safe here
+      _hasInitializedPositions = true;
+    }
+  }
+
+  Future<void> _distributeCards() async {
     if (_isDistributing) {
       return;
     }
     _isDistributing = true;
+    final deckPosition = _positions.getPosition(BoardLocations.deck);
+    final orderderPlayers = context.read<RoundManager>().orderedPlayers;
+    final completer = context.read<CardDistributionProvider>().completer;
+    final numberOfCardsToDistribute =
+        context.read<CardDistributionProvider>().cardsToDistribute;
+    int cardsAlreadyDistributed = 0;
+    for (Player player in orderderPlayers) {
+      for (PlayingCard? card in player.hand) {
+        // If card is last one we must tell backend we are done
 
-    final order = _getDistributionOrder(startingPlayer);
-    for (PlayerType type in order) {
-      final hand = type == PlayerType.human ? backendHumanHand : backendBotHand;
-      for (PlayingCard? card in hand) {
-        if (card == null || _cardsShown.contains(card)) {
+        if (card == null) {
           continue;
         }
-        final targetPosition = cardPositions.transformPositionKey(
-            _positionController.whereToDistributeCards(type, card));
+        cardsAlreadyDistributed++;
 
+        final targetPosition = _positions.transformPositionKey(
+            _positionController.whereToDistributeCards(player, card));
+
+        // Create the cards
         final cardData = MovingCardData(
           card: card,
-          position: initialPosition,
-          isTappable: type == PlayerType.human,
+          position: deckPosition,
+          isTappable: player is HumanPlayer,
         );
 
-        _cardsWidgetsCreated.add(cardData);
-        _cardsShown.add(card);
+        if (cardsAlreadyDistributed == numberOfCardsToDistribute) {
+          cardData.onMoveEnd = completer;
+        }
 
-        setState(() {});
-        await Future.delayed(timeForCardToBuild);
+        setState(() {
+          _cardsWidgetsCreated.add(cardData);
+        });
 
+        // Wait for card to be created
+        await Future.delayed(_timeForCardToBuild);
+
+        // Distribute card
         setState(() {
           cardData.position = targetPosition;
         });
 
-        if (type == PlayerType.human) {
+        if (player is HumanPlayer) {
+          await Future.delayed(Duration(milliseconds: 200));
           cardData.controller.flipcard();
         }
 
-        await Future.delayed(delayBetweenCards);
+        await Future.delayed(_pauseBetweenCardsDistribution);
       }
     }
     _isDistributing = false;
-    setState(() {
-      _updatePhase();
-    });
   }
+
+  // Future<void> _distributeCards(
+  //     {required List<Player> players,
+  //     required CardPositions cardPositions,
+  //     required Player startingPlayer}) async {
+  //   // Animation constants
+  //   const delayBetweenCards = Duration(milliseconds: 200);
+  //   const timeForCardToBuild = Duration(milliseconds: 50);
+
+  //   //Positioning
+  //   final initialPosition =
+  //       cardPositions.getCurrentPosition(BoardLocations.deck);
+
+  //   if (_isDistributing) {
+  //     return;
+  //   }
+  //   _isDistributing = true;
+
+  //   final orderedPlayers = _getDistributionOrder(startingPlayer, players);
+  //   for (Player player in orderedPlayers) {
+  //     for (PlayingCard? card in player.hand) {
+  //       if (card == null || _positionController.isAlreadyDistributed(card)) {
+  //         continue;
+  //       }
+  //       final targetPosition = cardPositions.transformPositionKey(
+  //           _positionController.whereToDistributeCards(player, card));
+
+  //       final cardData = MovingCardData(
+  //         card: card,
+  //         position: initialPosition,
+  //         isTappable: player is HumanPlayer,
+  //       );
+
+  //       _cardsWidgetsCreated.add(cardData);
+
+  //       setState(() {});
+  //       await Future.delayed(timeForCardToBuild);
+
+  //       setState(() {
+  //         cardData.position = targetPosition;
+  //       });
+
+  //       if (player is HumanPlayer) {
+  //         await Future.delayed(Duration(milliseconds: 200));
+  //         cardData.controller.flipcard();
+  //       }
+
+  //       await Future.delayed(delayBetweenCards);
+  //     }
+  //   }
+  //   _isDistributing = false;
+  //   setState(() {
+  //     _updatePhase();
+  //   });
+  // }
 
   void _updatePhase() {
     switch (_currentPhase) {
@@ -95,68 +176,142 @@ class _BoardWidgetState extends State<BoardWidget> {
     }
   }
 
-  static List<PlayerType> _getDistributionOrder(PlayerType type) {
-    return type == PlayerType.human
-        ? [PlayerType.human, PlayerType.bot]
-        : [PlayerType.bot, PlayerType.human];
+  List<Player> _getDistributionOrder(
+      Player startingPlayer, List<Player> allPlayers) {
+    final List<Player> order = [];
+    order.add(startingPlayer);
+    order.add(allPlayers.firstWhere((player) => player != startingPlayer));
+    return order;
   }
 
-  PlayerType _determineFirstPlayerType(Player firstPlayer) {
-    return firstPlayer is Bot ? PlayerType.bot : PlayerType.human;
-  }
+  Future<void> _playCard(
+      PlayingCard card, CardPositions positions, Player player) async {
+    if (_isDistributing ||
+        _isCollecting ||
+        _isPlaying ||
+        _cardsWidgetsCreated.length < Player.maxCardsInHand * 2) {
+      return;
+    }
+    _isPlaying = true;
 
-  void _playCard(PlayingCard card, CardPositions positions, PlayerType type) {
     final cardWidget = _cardsWidgetsCreated.firstWhere((c) => c.card == card);
-    final index = type == PlayerType.bot ? 0 : 1;
-    final target = positions.getCurrentPosition(BoardLocations.table, index);
-    _isWaitingForUserInput = true;
+    final index = player is Bot ? 0 : 1;
+    final target = positions.getPosition(BoardLocations.table, index);
+    final completer = Completer<void>();
+    cardWidget.onMoveEnd = completer;
+    _positionController.freeHandSpot(player, card);
+    _cardsOnTheTable.add(cardWidget);
     setState(() {
       cardWidget.position = target;
-      if (type == PlayerType.bot) {
+      if (player is Bot) {
         cardWidget.controller.flipcard();
+        _hasBotPlayed = true;
+      } else {
+        _hasUserPlayed = true;
+        player.userPlaysCard(card);
       }
     });
+    await completer.future;
+    _isPlaying = false;
+    if (_hasBotPlayed && _hasUserPlayed) {
+      setState(() {
+        _updatePhase();
+      });
+    }
   }
+
+  // Future<void> _collectCards(Player winner, CardPositions positions) async {
+  //   if (_isCollecting) {
+  //     return;
+  //   }
+  //   _isCollecting = true;
+
+  //   final winnerLocation = winner is Bot
+  //       ? BoardLocations.northPlayerPile
+  //       : BoardLocations.southPlayerPile;
+  //   final target = positions.getCurrentPosition(winnerLocation);
+  //   await Future.delayed(Duration(milliseconds: 1000));
+  //   final Completer<void> moveCompleter = Completer<void>();
+  //   _cardsOnTheTable.first.onMoveEnd = moveCompleter;
+  //   setState(() {
+  //     if (_cardsOnTheTable.isNotEmpty) {
+  //       _cardsOnTheTable.first.position = target;
+  //       _cardsOnTheTable.last.position = target;
+  //     }
+  //   });
+  //   await moveCompleter.future;
+  //   if (_cardsOnTheTable.isNotEmpty) {
+  //     _cardsWidgetsCreated
+  //         .removeWhere((item) => _cardsOnTheTable.contains(item));
+  //     _cardsOnTheTable.clear();
+  //   }
+  //   _hasBotPlayed = false;
+  //   _hasUserPlayed = false;
+  //   _isCollecting = false;
+  //   setState(() {
+  //     _updatePhase();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final players = context.watch<Game>().players;
-    final botPlayer = players[0];
-    final humanPlayer = players[1];
-    final round = context.watch<RoundManager>();
+    final players = context.read<Game>().players;
+    //final botPlayer = players[0];
+    final humanPlayer = players[0];
+    final round = context.read<RoundManager>();
 
-    final positions = CardPositions(
-        height: MediaQuery.sizeOf(context).height,
-        width: MediaQuery.sizeOf(context).width);
+    final distributionProvider = context.watch<CardDistributionProvider>();
 
-    if (_currentPhase == RoundPhase.distribution) {
-      _distributeCards(
-          startingPlayer: _determineFirstPlayerType(round.startingPlayer),
-          backendBotHand: botPlayer.hand,
-          backendHumanHand: humanPlayer.hand,
-          cardPositions: positions);
-    } else if (_currentPhase == RoundPhase.play &&
-        _determineFirstPlayerType(round.startingPlayer) == PlayerType.bot &&
-        !_isWaitingForUserInput) {
-      _playCard(round.cardsOnTheTable.first, positions, PlayerType.bot);
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (distributionProvider.shouldDistribute && !_isDistributing) {
+        _distributeCards().then((_) {
+          distributionProvider.resetTrigger(); // avoid infinite loop
+        });
+      }
+    });
+
+    // // Distribution
+    // if (_currentPhase == RoundPhase.distribution) {
+    //   _distributeCards(
+    //       startingPlayer: round.startingPlayer,
+    //       players: players,
+    //       cardPositions: positions);
+    // }
+
+    // //Bot play
+    // if ((_currentPhase == RoundPhase.play &&
+    //     round.startingPlayer is Bot &&
+    //     !_hasBotPlayed)) {
+    //   _playCard(round.cardsOnTheTable.last, positions, botPlayer);
+    // }
+
+    // if (_currentPhase == RoundPhase.collection) {
+    //   _collectCards(round.startingPlayer, positions);
+    // }
 
     return Stack(
       children: [
         // Deck
         Positioned(
-          top: positions.getCurrentPosition(BoardLocations.deck).top,
-          left: positions.getCurrentPosition(BoardLocations.deck).left,
+          top: _positions.getPosition(BoardLocations.deck).top,
+          left: _positions.getPosition(BoardLocations.deck).left,
           child: DeckWidget(),
         ),
         ..._cardsWidgetsCreated.map((card) => MovingCardWidget(
             position: card.position,
             card: card.card,
             controller: card.controller,
-            onTap: () {
+            onMoveComplete: card.onMoveEnd,
+            onTap: () async {
               if (card.isTappable && round.isWaitingForInput) {
-                _playCard(card.card, positions, PlayerType.human);
+                await _playCard(card.card, _positions, humanPlayer);
               }
+              // if (!_hasBotPlayed) {
+              //   botPlayer.makeBotChooseCard();
+              //   final cardPlayedByBot = round.cardsOnTheTable
+              //       .firstWhere((item) => item != card.card);
+              //   _playCard(cardPlayedByBot, positions, botPlayer);
+              // }
             },
             key: card.key))
       ],
@@ -170,6 +325,7 @@ class MovingCardData {
   final Key key;
   final FlipCardController controller = FlipCardController();
   final bool isTappable;
+  Completer<void>? onMoveEnd;
 
   MovingCardData(
       {required this.card, required this.position, required this.isTappable})
