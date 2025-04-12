@@ -3,7 +3,6 @@ import 'package:briscola_app/game_internals/game.dart';
 import 'package:briscola_app/game_internals/human_player.dart';
 import 'package:briscola_app/main_menu/main_menu_screen.dart';
 import 'package:briscola_app/play_session/play_session_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -29,7 +28,7 @@ final router = GoRouter(
                 ChangeNotifierProvider.value(value: humanPlayer),
                 ChangeNotifierProvider.value(value: game.roundManager),
                 ChangeNotifierProvider.value(
-                    value: game.roundManager.cardDistributionProvider),
+                    value: game.roundManager.playScreenAnimationController),
               ],
               child: const PlaySessionScreen(),
             );

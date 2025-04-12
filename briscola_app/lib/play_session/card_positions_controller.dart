@@ -30,8 +30,8 @@ class CardPositionsController {
     return PositionKey(boardLocation: location, index: index);
   }
 
-  void freeHandSpot(Player player, PlayingCard card) {
-    final targetHand = player is Bot ? _botHandShown : _humanHandShown;
+  void freeHandSpot(bool isBot, PlayingCard card) {
+    final targetHand = isBot ? _botHandShown : _humanHandShown;
     final index = targetHand.indexOf(card);
     if (index >= 0) {
       targetHand[index] = null;

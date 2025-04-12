@@ -1,6 +1,7 @@
 import 'dart:async';
+import 'package:briscola_app/game_internals/bot.dart';
 import 'package:briscola_app/game_internals/ordered_players.dart';
-import 'package:briscola_app/play_session/card_distribution_provider.dart';
+import 'package:briscola_app/play_session/play_screen_animation_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
@@ -14,14 +15,9 @@ class RoundManager extends ChangeNotifier {
   final List<PlayingCard> _cardsOnTheTable = [];
   PlayingCard? _strongestCardOnTheTable;
   late Player _holderOfStrongestCard;
-  RoundPhase _phase = RoundPhase.distribution;
-
-  bool _isWaitingForUserInput = false;
 
   final OrderedPlayers _orderedPlayers;
-
-  final CardDistributionProvider _cardDistributionProvider =
-      CardDistributionProvider();
+  final _playScreenAnimationController = PlayScreenAnimationController();
 
   final Logger _log = Logger("Round Manager");
 
@@ -35,12 +31,11 @@ class RoundManager extends ChangeNotifier {
     _log.info("---- New round ----");
     await _distributeCards();
     await _letPlayersMakeTheirPlay();
-    _collectCards();
+    await _collectCards();
     _resetCompleters();
   }
 
   Future<void> _distributeCards() async {
-    _phase = RoundPhase.distribution;
     if (_game.deck.cardsLeft < _game.players.length) {
       return;
     }
@@ -51,11 +46,10 @@ class RoundManager extends ChangeNotifier {
         cardsToDistribute++;
       }
     }
-    await _cardDistributionProvider.distributeCards(cardsToDistribute);
+    await _playScreenAnimationController.distributeCards(cardsToDistribute);
   }
 
   Future<void> _letPlayersMakeTheirPlay() async {
-    _phase = RoundPhase.play;
     final indexOfStartingPlayer = _game.players.indexOf(_holderOfStrongestCard);
 
     for (int i = 0; i < _game.players.length; i++) {
@@ -65,19 +59,14 @@ class RoundManager extends ChangeNotifier {
       final PlayingCard cardPlayed;
       if (currentPlayer.isBot) {
         cardPlayed = await currentPlayer.makeBotChooseCard();
+        await _playScreenAnimationController.moveBotCardToTable(cardPlayed);
       } else {
-        _isWaitingForUserInput = true;
-        notifyListeners();
-        cardPlayed = await currentPlayer.waitForPlayerMove();
-        _isWaitingForUserInput = false;
-        notifyListeners();
+        _log.info("Waiting for user input...");
+        cardPlayed = await _playScreenAnimationController.makeUserChooseCard();
       }
       currentPlayer.removeCardFromHand(cardPlayed);
       _log.info("${currentPlayer.name} played $cardPlayed");
       _addCardToTable(cardPlayed, currentPlayer);
-      if (currentPlayer.isBot && i == _game.players.length - 1) {
-        await Future.delayed(Duration(seconds: 2));
-      }
     }
   }
 
@@ -116,12 +105,13 @@ class RoundManager extends ChangeNotifier {
     _holderOfStrongestCard = player;
   }
 
-  void _collectCards() {
-    _phase = RoundPhase.collection;
+  Future<void> _collectCards() async {
+    _log.info("Collecting cards...");
     _holderOfStrongestCard.collectPlayedCards(_cardsOnTheTable);
+    await _playScreenAnimationController.collectCards(
+        cardsOnTheTable, _holderOfStrongestCard is Bot);
     _cardsOnTheTable.clear();
     _strongestCardOnTheTable = null;
-    notifyListeners();
   }
 
   List<PlayingCard> get cardsOnTheTable => List.unmodifiable(_cardsOnTheTable);
@@ -132,14 +122,10 @@ class RoundManager extends ChangeNotifier {
     }
   }
 
-  RoundPhase get phase => _phase;
-
   Player get startingPlayer => _holderOfStrongestCard;
 
-  bool get isWaitingForInput => _isWaitingForUserInput;
-
-  CardDistributionProvider get cardDistributionProvider =>
-      _cardDistributionProvider;
+  PlayScreenAnimationController get playScreenAnimationController =>
+      _playScreenAnimationController;
 
   List<Player> get orderedPlayers {
     return _orderedPlayers.getOrderedPlayers(_holderOfStrongestCard);
