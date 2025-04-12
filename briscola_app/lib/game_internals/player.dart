@@ -80,4 +80,7 @@ abstract class Player implements Comparable<Player> {
 
   @nonVirtual
   bool get isBot => _botStrategy == null ? false : true;
+
+  @nonVirtual
+  List<PlayingCard> get cardsWon => List.unmodifiable(_cardsWon);
 }
