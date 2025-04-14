@@ -4,8 +4,8 @@ import 'package:flutter_flip_card/flutter_flip_card.dart';
 import '../game_internals/playing_card.dart';
 
 class PlayingCardWidget extends StatelessWidget {
-  static const double width = 68.75;
-  static const double height = 109.25;
+  static const double width = 81;
+  static const double height = 129;
   static const double borderRadius = 5;
   static const String pathToBackCardImage = "assets/cards/card-back.jpg";
   final CardType cardType;
