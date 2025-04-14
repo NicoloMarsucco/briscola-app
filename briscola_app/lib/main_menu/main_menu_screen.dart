@@ -16,24 +16,26 @@ class MainMenuScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: palette.backgroundMain,
       body: ResponsiveScreen(
-          squarishMainArea: Center(
-            child: Text(
-              'Briscola App',
-              textAlign: TextAlign.center,
-              style: customTextStyles.mainMenuTitle,
-            ),
+        squarishMainArea: Center(
+          child: Text(
+            'Briscola \nAI',
+            textAlign: TextAlign.center,
+            style: customTextStyles.mainMenuTitle,
           ),
-          rectangularMenuArea: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    GoRouter.of(context).go('/play');
-                  },
-                  child: const Text('Play')),
-              SizedBox(height: 50)
-            ],
-          )),
+        ),
+        rectangularMenuArea: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            ElevatedButton(
+                onPressed: () {
+                  GoRouter.of(context).go('/play');
+                },
+                child: const Text('Play')),
+            SizedBox(height: 50)
+          ],
+        ),
+        backgroundImage: "assets/background/colorful-gradient.jpg",
+      ),
     );
   }
 }

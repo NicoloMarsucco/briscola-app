@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:briscola_app/game_internals/human_player.dart';
 import 'package:briscola_app/game_internals/player.dart';
 import 'package:briscola_app/game_internals/playing_card.dart';
-import 'package:briscola_app/game_internals/round_manager.dart';
 import 'package:briscola_app/play_session/card_positions.dart';
 import 'package:briscola_app/play_session/card_positions_controller.dart';
 import 'package:briscola_app/play_session/deck_widget.dart';
@@ -198,29 +197,37 @@ class _BoardWidgetState extends State<BoardWidget> {
       }
     });
 
-    return Stack(
-      children: [
-        // Deck
-        Positioned(
-          top: _positions.getPosition(BoardLocations.deck).top,
-          left: _positions.getPosition(BoardLocations.deck).left,
-          child: DeckWidget(
-              briscola: context.read<PlayScreenAnimationController>().briscola,
-              showDeck: context.read<PlayScreenAnimationController>().showDeck,
-              key: ValueKey("deck")),
-        ),
-        ..._cardsWidgetsCreated.map((card) => MovingCardWidget(
-            position: card.position,
-            card: card.card,
-            controller: card.controller,
-            onMoveComplete: card.onMoveEnd,
-            onTap: () async {
-              if (card.isTappable && shouldUserChooseCard) {
-                await _playUserChosenCard(card.card);
-              }
-            },
-            key: card.key))
-      ],
+    return Container(
+      decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("assets/background/colorful-gradient.jpg"),
+              fit: BoxFit.cover)),
+      child: Stack(
+        children: [
+          // Deck
+          Positioned(
+            top: _positions.getPosition(BoardLocations.deck).top,
+            left: _positions.getPosition(BoardLocations.deck).left,
+            child: DeckWidget(
+                briscola:
+                    context.read<PlayScreenAnimationController>().briscola,
+                showDeck:
+                    context.read<PlayScreenAnimationController>().showDeck,
+                key: ValueKey("deck")),
+          ),
+          ..._cardsWidgetsCreated.map((card) => MovingCardWidget(
+              position: card.position,
+              card: card.card,
+              controller: card.controller,
+              onMoveComplete: card.onMoveEnd,
+              onTap: () async {
+                if (card.isTappable && shouldUserChooseCard) {
+                  await _playUserChosenCard(card.card);
+                }
+              },
+              key: card.key))
+        ],
+      ),
     );
   }
 }

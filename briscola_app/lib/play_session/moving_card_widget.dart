@@ -9,7 +9,7 @@ import 'package:flutter_flip_card/flutter_flip_card.dart';
 class MovingCardWidget extends StatelessWidget {
   Position position;
   static const Curve curve = Curves.ease;
-  static const Duration duration = Duration(milliseconds: 600);
+  static const Duration duration = Duration(milliseconds: 500);
   final PlayingCard card;
   final FlipCardController controller;
   final VoidCallback? onTap;

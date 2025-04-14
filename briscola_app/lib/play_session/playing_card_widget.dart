@@ -6,7 +6,7 @@ import '../game_internals/playing_card.dart';
 class PlayingCardWidget extends StatelessWidget {
   static const double width = 81;
   static const double height = 129;
-  static const double borderRadius = 5;
+  static const double borderRadius = 7;
   static const String pathToBackCardImage = "assets/cards/card-back.jpg";
   final CardType cardType;
 
