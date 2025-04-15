@@ -8,10 +8,10 @@ import '../game_internals/player.dart';
 
 class CardPositions {
   final _cardLocations = <BoardLocations, List<Position>>{};
-  static late final double _verticalPadding;
+  static late double _verticalPadding;
   static const double _horizontalPaddingDeck = 30;
   static const double _horizontalPaddingCardsOnTheTable = 50;
-  static late final double _horizontalPaddingHand;
+  static late double _horizontalPaddingHand;
   static const double _verticalOffsetCardsOnTheTable = 30;
 
   CardPositions();
