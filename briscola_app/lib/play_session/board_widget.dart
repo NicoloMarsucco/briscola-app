@@ -5,6 +5,7 @@ import 'package:briscola_app/game_internals/playing_card.dart';
 import 'package:briscola_app/play_session/card_positions.dart';
 import 'package:briscola_app/play_session/card_positions_controller.dart';
 import 'package:briscola_app/play_session/deck_widget.dart';
+import 'package:briscola_app/play_session/end_game_widget.dart';
 import 'package:briscola_app/play_session/moving_card_widget.dart';
 import 'package:briscola_app/play_session/play_screen_animation_controller.dart';
 import 'package:flutter/material.dart';
@@ -186,6 +187,9 @@ class _BoardWidgetState extends State<BoardWidget> {
     bool shouldCollectCards =
         context.select<PlayScreenAnimationController, bool>(
             (controller) => controller.shouldCollectCards);
+    bool shouldShowEndOfGameWindow =
+        context.select<PlayScreenAnimationController, bool>(
+            (controller) => controller.shouldShowEndOfGameWindow);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (shouldDistribute && !_isDistributing) {
@@ -225,7 +229,12 @@ class _BoardWidgetState extends State<BoardWidget> {
                   await _playUserChosenCard(card.card);
                 }
               },
-              key: card.key))
+              key: card.key)),
+          if (shouldShowEndOfGameWindow)
+            EndGameWidget(
+              result: context.read<PlayScreenAnimationController>().result,
+              points: context.read<PlayScreenAnimationController>().points,
+            )
         ],
       ),
     );

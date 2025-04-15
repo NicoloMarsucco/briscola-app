@@ -38,6 +38,8 @@ class Game {
       await _roundManager.startRound();
       _isFirstRound = false;
     }
+    _roundManager.playScreenAnimationController
+        .showEndOfGameWindow(_players.last.points);
     _isFinished = true;
   }
 

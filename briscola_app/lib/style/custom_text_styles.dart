@@ -15,4 +15,11 @@ class CustomTextStyles {
           ),
         ],
       );
+
+  TextStyle get endGameMessage =>
+      GoogleFonts.luckiestGuy(fontSize: 20, color: Colors.black);
+
+  TextStyle get endGameTitle => GoogleFonts.luckiestGuy(
+        fontSize: 48,
+      );
 }
