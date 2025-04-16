@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:briscola_app/game_internals/bot.dart';
+import 'package:briscola_app/game_internals/card_strength_comparator.dart';
 import 'package:briscola_app/game_internals/ordered_players.dart';
 import 'package:briscola_app/play_session/play_screen_controller.dart';
 import 'package:logging/logging.dart';
 
-import '../play_session/play_screen_controller.dart';
 import 'game.dart';
 import 'player.dart';
 import 'playing_card.dart';
@@ -88,31 +88,12 @@ class RoundManager {
 
   void _addCardToTable(PlayingCard card, Player player) {
     _cardsOnTheTable.add(card);
-    if (_isStrongestCardOnTheTable(card)) {
+    if (CardStrengthComparator.isStronger(
+        strongestCardOnTheTable: _strongestCardOnTheTable,
+        cardPlayed: card,
+        suitOfBriscola: _game.suitOfBriscola)) {
       _updateDetailsOfStrongestCard(card, player);
     }
-  }
-
-  bool _isStrongestCardOnTheTable(PlayingCard card) {
-    // If first card, it is the strongest on the table
-    if (_strongestCardOnTheTable == null) {
-      return true;
-    }
-
-    // If the cards are of the same suit and the new one has more
-    // points, it has to be stronger, otherwise not (regardless of wheter or not
-    // it a briscola)
-    if (card.suit == _strongestCardOnTheTable!.suit) {
-      if (card.points == 0 && _strongestCardOnTheTable!.points == 0) {
-        return card.rank > _strongestCardOnTheTable!.rank;
-      }
-      return card.points > _strongestCardOnTheTable!.points;
-    }
-
-    // If of different suits, only a briscola can win.
-    // If this is the case, it does not matter the number of point
-    // cause we have already checked the case in which both cards are briscolas
-    return card.suit == _game.suitOfBriscola;
   }
 
   void _updateDetailsOfStrongestCard(PlayingCard card, Player player) {
