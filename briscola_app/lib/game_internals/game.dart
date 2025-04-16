@@ -48,7 +48,9 @@ class Game {
   }
 
   void _resetPlayersPoints() {
-    _players.map((player) => player.resetPoints());
+    for (Player player in _players) {
+      player.resetPoints();
+    }
   }
 
   // API to start a new game
