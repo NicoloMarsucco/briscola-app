@@ -47,9 +47,14 @@ class Game {
         .showEndOfGameWindow(_players.last.points);
   }
 
+  void _resetPlayersPoints() {
+    _players.map((player) => player.resetPoints());
+  }
+
   // API to start a new game
   void startNewGame() {
     deck.prepareDeck();
+    _resetPlayersPoints();
     _getSuitOfBriscola();
     _isFirstRound = true;
     gameHistory.reset(deck.peekLastCard);
