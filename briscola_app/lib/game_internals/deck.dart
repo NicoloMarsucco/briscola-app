@@ -12,6 +12,7 @@ class Deck {
   void prepareDeck() {
     final listOfCards = _generateCards();
     listOfCards.shuffle();
+    _deck.clear();
     _deck.addAll(listOfCards);
   }
 

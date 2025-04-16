@@ -47,5 +47,30 @@ void main() {
         expect(deck.cardsLeft, 0);
       });
     });
+
+    group('Prepare deck method works correctly when called for a new game', () {
+      late Deck deck;
+      setUp(() {
+        deck = Deck();
+      });
+
+      test('New deck should contain 40 cards', () {
+        deck.prepareDeck();
+        expect(deck.cardsLeft, 40);
+      });
+
+      test("Order of cards of the new deck should be different", () {
+        final List<PlayingCard> cardsFirstDeck = [];
+        final List<PlayingCard> cardsSecondDeck = [];
+        while (deck.cardsLeft > 0) {
+          cardsFirstDeck.add(deck.drawTopCard());
+        }
+        deck.prepareDeck();
+        while (deck.cardsLeft > 0) {
+          cardsSecondDeck.add(deck.drawTopCard());
+        }
+        expect(cardsFirstDeck, isNot(equals(cardsSecondDeck)));
+      });
+    });
   });
 }
