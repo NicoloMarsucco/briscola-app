@@ -7,7 +7,7 @@ import 'package:briscola_app/play_session/card_positions_controller.dart';
 import 'package:briscola_app/play_session/deck_widget.dart';
 import 'package:briscola_app/play_session/end_game_widget.dart';
 import 'package:briscola_app/play_session/moving_card_widget.dart';
-import 'package:briscola_app/play_session/play_screen_animation_controller.dart';
+import 'package:briscola_app/play_session/play_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flip_card/controllers/flip_card_controllers.dart';
 import 'package:provider/provider.dart';
@@ -50,12 +50,11 @@ class _BoardWidgetState extends State<BoardWidget> {
     }
     _isDistributing = true;
     final deckPosition = _positions.getPosition(BoardLocations.deck);
-    final orderderPlayers =
-        context.read<PlayScreenAnimationController>().orderedPlayers;
+    final orderderPlayers = context.read<PlayScreenController>().orderedPlayers;
     final completer =
-        context.read<PlayScreenAnimationController>().distributionCompleter;
+        context.read<PlayScreenController>().distributionCompleter;
     final numberOfCardsToDistribute =
-        context.read<PlayScreenAnimationController>().numberOfCardsToDistribute;
+        context.read<PlayScreenController>().numberOfCardsToDistribute;
     int cardsAlreadyDistributed = 0;
     for (Player player in orderderPlayers) {
       for (PlayingCard? card in player.hand) {
@@ -109,11 +108,11 @@ class _BoardWidgetState extends State<BoardWidget> {
     }
     _isPlaying = true;
     final PlayingCard cardPlayed =
-        context.read<PlayScreenAnimationController>().cardPlayedByBot;
+        context.read<PlayScreenController>().cardPlayedByBot;
     final widgetPointer =
         _cardsWidgetsCreated.firstWhere((item) => item.card == cardPlayed);
     widgetPointer.onMoveEnd =
-        context.read<PlayScreenAnimationController>().botPlayCompleter;
+        context.read<PlayScreenController>().botPlayCompleter;
     setState(() {
       widgetPointer.position = _positions.getPosition(BoardLocations.table, 0);
     });
@@ -129,7 +128,7 @@ class _BoardWidgetState extends State<BoardWidget> {
     }
     _isPlaying = true;
     final controllerCompleter =
-        context.read<PlayScreenAnimationController>().userPlayCompleter;
+        context.read<PlayScreenController>().userPlayCompleter;
     final widgetPointer =
         _cardsWidgetsCreated.firstWhere((item) => item.card == cardPlayed);
     final momentaryCompleter = Completer<void>();
@@ -149,16 +148,15 @@ class _BoardWidgetState extends State<BoardWidget> {
     }
     _isCollecting = true;
     final List<PlayingCard> cardsToCollect =
-        context.read<PlayScreenAnimationController>().cardsToCollect;
+        context.read<PlayScreenController>().cardsToCollect;
     final List<MovingCardData> widgetsToCollect = [];
     for (int i = 0; i < cardsToCollect.length; i++) {
       widgetsToCollect.add(_cardsWidgetsCreated
           .firstWhere((movingcard) => movingcard.card == cardsToCollect[i]));
     }
     widgetsToCollect.last.onMoveEnd =
-        context.read<PlayScreenAnimationController>().cardsCollectionCompleter;
-    final isWinnerBot =
-        context.read<PlayScreenAnimationController>().isWinnerPlayerBot;
+        context.read<PlayScreenController>().cardsCollectionCompleter;
+    final isWinnerBot = context.read<PlayScreenController>().isWinnerPlayerBot;
     final targetBoardLocations = isWinnerBot
         ? BoardLocations.northPlayerPile
         : BoardLocations.southPlayerPile;
@@ -176,20 +174,16 @@ class _BoardWidgetState extends State<BoardWidget> {
   @override
   Widget build(BuildContext context) {
     //Flags to trigger animations
-    bool shouldDistribute = context.select<PlayScreenAnimationController, bool>(
+    bool shouldDistribute = context.select<PlayScreenController, bool>(
         (controller) => controller.shouldDistribute);
-    bool shouldPlayBotCard =
-        context.select<PlayScreenAnimationController, bool>(
-            (controller) => controller.shouldPlayBotCard);
-    bool shouldUserChooseCard =
-        context.select<PlayScreenAnimationController, bool>(
-            (controller) => controller.shouldUserChooseCard);
-    bool shouldCollectCards =
-        context.select<PlayScreenAnimationController, bool>(
-            (controller) => controller.shouldCollectCards);
-    bool shouldShowEndOfGameWindow =
-        context.select<PlayScreenAnimationController, bool>(
-            (controller) => controller.shouldShowEndOfGameWindow);
+    bool shouldPlayBotCard = context.select<PlayScreenController, bool>(
+        (controller) => controller.shouldPlayBotCard);
+    bool shouldUserChooseCard = context.select<PlayScreenController, bool>(
+        (controller) => controller.shouldUserChooseCard);
+    bool shouldCollectCards = context.select<PlayScreenController, bool>(
+        (controller) => controller.shouldCollectCards);
+    bool shouldShowEndOfGameWindow = context.select<PlayScreenController, bool>(
+        (controller) => controller.shouldShowEndOfGameWindow);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (shouldDistribute && !_isDistributing) {
@@ -213,10 +207,8 @@ class _BoardWidgetState extends State<BoardWidget> {
             top: _positions.getPosition(BoardLocations.deck).top,
             left: _positions.getPosition(BoardLocations.deck).left,
             child: DeckWidget(
-                briscola:
-                    context.read<PlayScreenAnimationController>().briscola,
-                showDeck:
-                    context.read<PlayScreenAnimationController>().showDeck),
+                briscola: context.read<PlayScreenController>().briscola,
+                showDeck: context.read<PlayScreenController>().showDeck),
           ),
           ..._cardsWidgetsCreated.map((card) => MovingCardWidget(
               position: card.position,
@@ -230,8 +222,8 @@ class _BoardWidgetState extends State<BoardWidget> {
               })),
           if (shouldShowEndOfGameWindow)
             EndGameWidget(
-              result: context.read<PlayScreenAnimationController>().result,
-              points: context.read<PlayScreenAnimationController>().points,
+              result: context.read<PlayScreenController>().result,
+              points: context.read<PlayScreenController>().points,
               cardWidgetsCreated: _cardsWidgetsCreated,
               cardsCreated: _widgetsOfCardsCreated,
             )

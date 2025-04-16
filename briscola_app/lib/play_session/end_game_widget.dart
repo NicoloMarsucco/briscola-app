@@ -1,6 +1,6 @@
 import 'package:briscola_app/game_internals/playing_card.dart';
 import 'package:briscola_app/play_session/board_widget.dart';
-import 'package:briscola_app/play_session/play_screen_animation_controller.dart';
+import 'package:briscola_app/play_session/play_screen_controller.dart';
 import 'package:briscola_app/style/custom_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -35,7 +35,7 @@ class EndGameWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final customTextStyles = context.watch<CustomTextStyles>();
     final palette = context.watch<Palette>();
-    final controller = context.read<PlayScreenAnimationController>();
+    final controller = context.read<PlayScreenController>();
 
     return Center(
       child: Container(

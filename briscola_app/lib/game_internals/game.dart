@@ -43,7 +43,7 @@ class Game {
       await _roundManager.startRound();
       _isFirstRound = false;
     }
-    _roundManager.playScreenAnimationController
+    _roundManager.playScreenController
         .showEndOfGameWindow(_players.last.points);
   }
 

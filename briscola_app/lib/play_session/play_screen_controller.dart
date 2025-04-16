@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import '../game_internals/game.dart';
 import '../game_internals/player.dart';
 
-class PlayScreenAnimationController extends ChangeNotifier {
+class PlayScreenController extends ChangeNotifier {
   // Paramaters for animation logic
   int _numberOfCardsToDistribute = 0;
   List<Player> _orderedListOfPlayers = [];
@@ -27,8 +27,7 @@ class PlayScreenAnimationController extends ChangeNotifier {
   Completer<PlayingCard> _userPlayCompleter = Completer<PlayingCard>();
   Completer<void> _cardsCollectionCompleter = Completer<void>();
 
-  PlayScreenAnimationController(
-      {required PlayingCard briscola, required Game game})
+  PlayScreenController({required PlayingCard briscola, required Game game})
       : _briscola = briscola,
         _game = game {
     _distributionCompleter.complete();
