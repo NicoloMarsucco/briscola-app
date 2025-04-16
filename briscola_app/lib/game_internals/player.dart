@@ -74,6 +74,11 @@ abstract class Player implements Comparable<Player> {
   }
 
   @nonVirtual
+  void resetPoints() {
+    _points = 0;
+  }
+
+  @nonVirtual
   bool get isHandEmpty {
     return _hand.every((card) => card == null);
   }

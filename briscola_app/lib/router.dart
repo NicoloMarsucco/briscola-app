@@ -23,7 +23,7 @@ final router = GoRouter(
 
             return MultiProvider(providers: [
               ChangeNotifierProvider.value(
-                  value: game.roundManager.playScreenAnimationController),
+                  value: game.roundManager.playScreenController),
             ], child: PlaySessionScreen(game: game));
           },
         ),

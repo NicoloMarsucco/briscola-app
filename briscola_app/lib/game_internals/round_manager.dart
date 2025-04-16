@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:briscola_app/game_internals/bot.dart';
 import 'package:briscola_app/game_internals/ordered_players.dart';
-import 'package:briscola_app/play_session/play_screen_animation_controller.dart';
+import 'package:briscola_app/play_session/play_screen_controller.dart';
 import 'package:logging/logging.dart';
 
+import '../play_session/play_screen_controller.dart';
 import 'game.dart';
 import 'player.dart';
 import 'playing_card.dart';
@@ -16,16 +18,16 @@ class RoundManager {
   late Player _holderOfStrongestCard;
 
   final OrderedPlayers _orderedPlayers;
-  final PlayScreenAnimationController _playScreenAnimationController;
+  final PlayScreenController _playScreenController;
 
   final Logger _log = Logger("Round Manager");
 
   RoundManager({required Game game})
       : _game = game,
         _orderedPlayers = OrderedPlayers(players: game.players),
-        _playScreenAnimationController =
-            PlayScreenAnimationController(briscola: game.deck.peekLastCard) {
-    _holderOfStrongestCard = _game.players.first;
+        _playScreenController =
+            PlayScreenController(briscola: game.deck.peekLastCard, game: game) {
+    _holderOfStrongestCard = _getRandomPlayer(_game.players);
   }
 
   Future<void> startRound() async {
@@ -35,12 +37,22 @@ class RoundManager {
     await _collectCards();
   }
 
+  void prepareForNewGame() {
+    _playScreenController.newGame(_game.deck.peekLastCard);
+    _holderOfStrongestCard = _getRandomPlayer(_game.players);
+  }
+
+  static Player _getRandomPlayer(List<Player> players) {
+    final random = Random();
+    return players[random.nextInt(players.length)];
+  }
+
   Future<void> _distributeCards() async {
     if (_game.deck.cardsLeft < _game.players.length) {
       return;
     }
     if (_game.deck.cardsLeft / _game.players.length == 1) {
-      _playScreenAnimationController.hideDeck();
+      _playScreenController.hideDeck();
     }
     int cardsToDistribute = 0;
     for (Player player in _game.players) {
@@ -49,7 +61,7 @@ class RoundManager {
         cardsToDistribute++;
       }
     }
-    await _playScreenAnimationController.distributeCards(
+    await _playScreenController.distributeCards(
         cardsToDistribute, orderedPlayers);
   }
 
@@ -63,10 +75,10 @@ class RoundManager {
       final PlayingCard cardPlayed;
       if (currentPlayer.isBot) {
         cardPlayed = await currentPlayer.makeBotChooseCard();
-        await _playScreenAnimationController.moveBotCardToTable(cardPlayed);
+        await _playScreenController.moveBotCardToTable(cardPlayed);
       } else {
         _log.info("Waiting for user input...");
-        cardPlayed = await _playScreenAnimationController.makeUserChooseCard();
+        cardPlayed = await _playScreenController.makeUserChooseCard();
       }
       currentPlayer.removeCardFromHand(cardPlayed);
       _log.info("${currentPlayer.name} played $cardPlayed");
@@ -111,7 +123,7 @@ class RoundManager {
   Future<void> _collectCards() async {
     _log.info("Collecting cards...");
     _holderOfStrongestCard.collectPlayedCards(_cardsOnTheTable);
-    await _playScreenAnimationController.collectCards(
+    await _playScreenController.collectCards(
         cardsOnTheTable, _holderOfStrongestCard is Bot);
     _cardsOnTheTable.clear();
     _strongestCardOnTheTable = null;
@@ -121,8 +133,7 @@ class RoundManager {
 
   Player get startingPlayer => _holderOfStrongestCard;
 
-  PlayScreenAnimationController get playScreenAnimationController =>
-      _playScreenAnimationController;
+  PlayScreenController get playScreenController => _playScreenController;
 
   List<Player> get orderedPlayers {
     return _orderedPlayers.getOrderedPlayers(_holderOfStrongestCard);
