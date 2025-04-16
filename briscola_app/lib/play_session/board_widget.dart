@@ -216,8 +216,7 @@ class _BoardWidgetState extends State<BoardWidget> {
                 briscola:
                     context.read<PlayScreenAnimationController>().briscola,
                 showDeck:
-                    context.read<PlayScreenAnimationController>().showDeck,
-                key: ValueKey("deck")),
+                    context.read<PlayScreenAnimationController>().showDeck),
           ),
           ..._cardsWidgetsCreated.map((card) => MovingCardWidget(
               position: card.position,
@@ -228,12 +227,13 @@ class _BoardWidgetState extends State<BoardWidget> {
                 if (card.isTappable && shouldUserChooseCard) {
                   await _playUserChosenCard(card.card);
                 }
-              },
-              key: card.key)),
+              })),
           if (shouldShowEndOfGameWindow)
             EndGameWidget(
               result: context.read<PlayScreenAnimationController>().result,
               points: context.read<PlayScreenAnimationController>().points,
+              cardWidgetsCreated: _cardsWidgetsCreated,
+              cardsCreated: _widgetsOfCardsCreated,
             )
         ],
       ),

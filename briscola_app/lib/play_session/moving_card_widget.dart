@@ -19,7 +19,7 @@ class MovingCardWidget extends StatelessWidget {
     required this.position,
     required this.card,
     required this.controller,
-    required Key key,
+    Key? key,
     this.onMoveComplete,
     this.onTap,
   }) : super(key: key);

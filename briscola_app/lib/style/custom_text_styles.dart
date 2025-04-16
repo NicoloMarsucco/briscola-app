@@ -22,4 +22,8 @@ class CustomTextStyles {
   TextStyle get endGameTitle => GoogleFonts.luckiestGuy(
         fontSize: 48,
       );
+
+  TextStyle get buttonText => GoogleFonts.luckiestGuy(
+        fontSize: 20,
+      );
 }

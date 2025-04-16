@@ -8,13 +8,12 @@ class Game {
   final List<Player> _players;
   final Deck deck = Deck();
   late final GameHistory gameHistory;
-  late final Suit suitOfBriscola;
+  late Suit _suitOfBriscola;
   late final RoundManager _roundManager;
-  bool _isFinished = false;
   bool _isFirstRound = true;
 
   Game({required List<Player> players}) : _players = players {
-    suitOfBriscola = deck.peekLastCard.suit;
+    _getSuitOfBriscola();
     gameHistory = GameHistory(
         lastCard: deck.peekLastCard, numberOfPlayers: players.length);
     _subscribeBotsToHistory();
@@ -29,9 +28,15 @@ class Game {
     }
   }
 
+  void _getSuitOfBriscola() {
+    _suitOfBriscola = deck.peekLastCard.suit;
+  }
+
   List<Player> get players => List.unmodifiable(_players);
 
   RoundManager get roundManager => _roundManager;
+
+  Suit get suitOfBriscola => _suitOfBriscola;
 
   Future<void> startGame() async {
     while (!_players.first.isHandEmpty || _isFirstRound) {
@@ -40,8 +45,15 @@ class Game {
     }
     _roundManager.playScreenAnimationController
         .showEndOfGameWindow(_players.last.points);
-    _isFinished = true;
   }
 
-  bool get isFinished => _isFinished;
+  // API to start a new game
+  void startNewGame() {
+    deck.prepareDeck();
+    _getSuitOfBriscola();
+    _isFirstRound = true;
+    gameHistory.reset(deck.peekLastCard);
+    _roundManager.prepareForNewGame();
+    startGame();
+  }
 }

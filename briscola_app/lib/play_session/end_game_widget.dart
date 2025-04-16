@@ -1,23 +1,42 @@
+import 'package:briscola_app/game_internals/playing_card.dart';
+import 'package:briscola_app/play_session/board_widget.dart';
+import 'package:briscola_app/play_session/play_screen_animation_controller.dart';
 import 'package:briscola_app/style/custom_text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
+import '../style/app_button_widget.dart';
+import '../style/palette.dart';
 
 class EndGameWidget extends StatelessWidget {
   final GameResult result;
   final int points;
+  final List<MovingCardData> _cardWidgetsCreated;
+  final Set<PlayingCard> _widgetsOfCardsCreated;
   static const double height = 200;
   static const double width = 300;
   static const Map<GameResult, String> _message = {
-    GameResult.win: "You won!",
-    GameResult.draw: "You drew!",
-    GameResult.loss: "You lost!"
+    GameResult.win: "YOU WON!",
+    GameResult.draw: "YOU DREW!",
+    GameResult.loss: "YOU LOST!"
   };
 
-  const EndGameWidget({super.key, required this.result, required this.points});
+  const EndGameWidget(
+      {super.key,
+      required this.result,
+      required this.points,
+      required List<MovingCardData> cardWidgetsCreated,
+      required Set<PlayingCard> cardsCreated})
+      : _cardWidgetsCreated = cardWidgetsCreated,
+        _widgetsOfCardsCreated = cardsCreated;
 
   @override
   Widget build(BuildContext context) {
     final customTextStyles = context.watch<CustomTextStyles>();
+    final palette = context.watch<Palette>();
+    final controller = context.read<PlayScreenAnimationController>();
+
     return Center(
       child: Container(
           height: height,
@@ -33,9 +52,29 @@ class EndGameWidget extends StatelessWidget {
               _buildRainbowEndGameMessage(
                   _message[result] ?? "", customTextStyles.endGameTitle),
               Text(
-                "Points: $points",
+                "POINTS: $points",
                 style: customTextStyles.endGameMessage,
-              )
+              ),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                AppButtonWidget(
+                  text: "MAIN MENU",
+                  onPressed: () {
+                    GoRouter.of(context).go('/');
+                  },
+                  palette: palette,
+                  textStyles: customTextStyles,
+                ),
+                AppButtonWidget(
+                  text: "NEW GAME",
+                  onPressed: () {
+                    _cardWidgetsCreated.clear();
+                    _widgetsOfCardsCreated.clear();
+                    controller.startNewGame();
+                  },
+                  palette: palette,
+                  textStyles: customTextStyles,
+                )
+              ])
             ],
           ))),
     );

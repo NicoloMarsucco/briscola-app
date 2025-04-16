@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:briscola_app/game_internals/bot.dart';
 import 'package:briscola_app/game_internals/ordered_players.dart';
 import 'package:briscola_app/play_session/play_screen_animation_controller.dart';
@@ -23,9 +24,9 @@ class RoundManager {
   RoundManager({required Game game})
       : _game = game,
         _orderedPlayers = OrderedPlayers(players: game.players),
-        _playScreenAnimationController =
-            PlayScreenAnimationController(briscola: game.deck.peekLastCard) {
-    _holderOfStrongestCard = _game.players.first;
+        _playScreenAnimationController = PlayScreenAnimationController(
+            briscola: game.deck.peekLastCard, game: game) {
+    _holderOfStrongestCard = _getRandomPlayer(_game.players);
   }
 
   Future<void> startRound() async {
@@ -33,6 +34,16 @@ class RoundManager {
     await _distributeCards();
     await _letPlayersMakeTheirPlay();
     await _collectCards();
+  }
+
+  void prepareForNewGame() {
+    _playScreenAnimationController.newGame(_game.deck.peekLastCard);
+    _holderOfStrongestCard = _getRandomPlayer(_game.players);
+  }
+
+  static Player _getRandomPlayer(List<Player> players) {
+    final random = Random();
+    return players[random.nextInt(players.length)];
   }
 
   Future<void> _distributeCards() async {

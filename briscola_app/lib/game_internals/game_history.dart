@@ -5,13 +5,19 @@ import 'package:tuple/tuple.dart';
 
 class GameHistory {
   final List<Tuple2<Player, PlayingCard>> _history = [];
-  final PlayingCard lastCard;
+  PlayingCard _lastCard;
   final int numberOfPlayers;
 
-  GameHistory({required this.lastCard, required this.numberOfPlayers});
+  GameHistory({required PlayingCard lastCard, required this.numberOfPlayers})
+      : _lastCard = lastCard;
 
   void recordMove(Player player, PlayingCard card) {
     _history.add(Tuple2(player, card));
+  }
+
+  void reset(PlayingCard lastCard) {
+    _history.clear();
+    _lastCard = lastCard;
   }
 
   List<Tuple2<Player, PlayingCard>> get viewHistory =>

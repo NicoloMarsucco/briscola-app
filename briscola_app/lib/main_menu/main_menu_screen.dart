@@ -1,3 +1,4 @@
+import 'package:briscola_app/style/app_button_widget.dart';
 import 'package:briscola_app/style/custom_text_styles.dart';
 import 'package:briscola_app/style/palette.dart';
 import 'package:briscola_app/style/responsive_screen.dart';
@@ -18,7 +19,7 @@ class MainMenuScreen extends StatelessWidget {
       body: ResponsiveScreen(
         squarishMainArea: Center(
           child: Text(
-            'Briscola \nAI',
+            'Briscola \nApp',
             textAlign: TextAlign.center,
             style: customTextStyles.mainMenuTitle,
           ),
@@ -26,11 +27,14 @@ class MainMenuScreen extends StatelessWidget {
         rectangularMenuArea: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            ElevatedButton(
-                onPressed: () {
-                  GoRouter.of(context).go('/play');
-                },
-                child: const Text('Play')),
+            AppButtonWidget(
+              text: "Play",
+              onPressed: () {
+                GoRouter.of(context).go('/play');
+              },
+              palette: palette,
+              textStyles: customTextStyles,
+            ),
             SizedBox(height: 50)
           ],
         ),
