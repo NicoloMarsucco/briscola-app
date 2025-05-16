@@ -21,7 +21,9 @@ class BoardWidget extends StatefulWidget {
 }
 
 class _BoardWidgetState extends State<BoardWidget> {
+  /// The coordinates of the locations where cards may go.
   final CardPositions _positions = CardPositions();
+
   final CardPositionsController _positionController = CardPositionsController();
 
   final List<MovingCardData> _cardsWidgetsCreated = [];
@@ -30,8 +32,9 @@ class _BoardWidgetState extends State<BoardWidget> {
   bool _isCollecting = false;
   bool _isPlaying = false;
 
-  // Animation times
+  /// Time to allow [PlayingCardWidget]s to be rendered.
   static const _timeForCardToBuild = Duration(milliseconds: 50);
+
   static const _pauseBetweenCardsDistribution = Duration(milliseconds: 200);
 
   @override
@@ -103,6 +106,7 @@ class _BoardWidgetState extends State<BoardWidget> {
       return;
     }
     _isPlaying = true;
+    final isDeckShown = context.read<PlayScreenController>().showDeck;
     final PlayingCard cardPlayed =
         context.read<PlayScreenController>().cardPlayedByBot;
     final widgetPointer =
@@ -110,7 +114,9 @@ class _BoardWidgetState extends State<BoardWidget> {
     widgetPointer.onMoveEnd =
         context.read<PlayScreenController>().botPlayCompleter;
     setState(() {
-      widgetPointer.position = _positions.getPosition(BoardLocations.table, 0);
+      widgetPointer.position = _positions.getPosition(
+          isDeckShown ? BoardLocations.table : BoardLocations.tableWithNoDeck,
+          0);
     });
     await Future.delayed(Duration(milliseconds: 200));
     widgetPointer.controller.flipcard();
@@ -123,6 +129,7 @@ class _BoardWidgetState extends State<BoardWidget> {
       return;
     }
     _isPlaying = true;
+    final isDeckShown = context.read<PlayScreenController>().showDeck;
     final controllerCompleter =
         context.read<PlayScreenController>().userPlayCompleter;
     final widgetPointer =
@@ -130,7 +137,9 @@ class _BoardWidgetState extends State<BoardWidget> {
     final momentaryCompleter = Completer<void>();
     widgetPointer.onMoveEnd = momentaryCompleter;
     setState(() {
-      widgetPointer.position = _positions.getPosition(BoardLocations.table, 1);
+      widgetPointer.position = _positions.getPosition(
+          isDeckShown ? BoardLocations.table : BoardLocations.tableWithNoDeck,
+          1);
     });
     await momentaryCompleter.future;
     controllerCompleter.complete(cardPlayed);

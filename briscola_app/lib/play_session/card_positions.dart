@@ -60,6 +60,7 @@ class CardPositions {
       _addTablePosition(width, height);
       _addNorthAndSouthHands(width, height);
       _addNorthSouthPiles(width, height);
+      _calculateTablePositionLastRound(width, height);
       _isInitialized = true;
     }
   }
@@ -136,6 +137,21 @@ class CardPositions {
         growable: false);
   }
 
+  /// Calculates the positions of the cards in the last round.
+  void _calculateTablePositionLastRound(double width, double height) {
+    final middle = height / 2;
+    _cardLocations[BoardLocations.tableWithNoDeck] = [
+      Position(
+          left: (width - PlayingCardWidget.width) / 2,
+          top: middle -
+              _verticalOffsetCardsOnTheTable / 2 -
+              PlayingCardWidget.height),
+      Position(
+          left: (width - PlayingCardWidget.width) / 2,
+          top: middle + _verticalOffsetCardsOnTheTable / 2)
+    ];
+  }
+
   /// The coordinates for a given position.
   Position getPosition(BoardLocations currentLocation, [int index = 0]) {
     return _cardLocations[currentLocation]?[index] ?? Position.zero;
@@ -170,6 +186,7 @@ class Position {
 enum BoardLocations {
   deck,
   table,
+  tableWithNoDeck,
   northPlayerHand,
   southPlayerHand,
   northPlayerPile,
