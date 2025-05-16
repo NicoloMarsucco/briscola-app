@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flip_card/controllers/flip_card_controllers.dart';
 import 'package:provider/provider.dart';
 
+/// The board where the game is played.
 class BoardWidget extends StatefulWidget {
   const BoardWidget({super.key});
 
@@ -28,7 +29,6 @@ class _BoardWidgetState extends State<BoardWidget> {
   bool _isDistributing = false;
   bool _isCollecting = false;
   bool _isPlaying = false;
-  bool _hasInitializedPositions = false;
 
   // Animation times
   static const _timeForCardToBuild = Duration(milliseconds: 50);
@@ -37,11 +37,7 @@ class _BoardWidgetState extends State<BoardWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    if (!_hasInitializedPositions) {
-      _positions.initialize(context); // Safe here
-      _hasInitializedPositions = true;
-    }
+    _positions.initialize(context);
   }
 
   Future<void> _distributeCards() async {
@@ -174,6 +170,9 @@ class _BoardWidgetState extends State<BoardWidget> {
   @override
   Widget build(BuildContext context) {
     //Flags to trigger animations
+
+    final controller = context.watch<PlayScreenController>();
+
     bool shouldDistribute = context.select<PlayScreenController, bool>(
         (controller) => controller.shouldDistribute);
     bool shouldPlayBotCard = context.select<PlayScreenController, bool>(
@@ -216,7 +215,10 @@ class _BoardWidgetState extends State<BoardWidget> {
               controller: card.controller,
               onMoveComplete: card.onMoveEnd,
               onTap: () async {
-                if (card.isTappable && shouldUserChooseCard) {
+                if (card.isTappable &&
+                    shouldUserChooseCard &&
+                    !controller.hasUserChosenCard) {
+                  controller.hasUserChosenCard = true;
                   await _playUserChosenCard(card.card);
                 }
               })),
