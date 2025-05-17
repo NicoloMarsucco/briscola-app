@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+
 import 'package:briscola_app/style/custom_text_styles.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
 import 'app_lifecycle/app_lifecycle.dart';
+import 'main_menu/random_quote_provider.dart';
 import 'router.dart';
 import 'style/palette.dart';
 
@@ -23,8 +25,12 @@ Future<void> main() async {
   });
 
   WidgetsFlutterBinding.ensureInitialized();
+
+// Load the quotes for the main menu.
+  await RandomQuoteProvider.loadQuotes();
+
   // Put game into full screen mode on mobile devices.
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
   // Lock the game to portrait mode on mobile devices.
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

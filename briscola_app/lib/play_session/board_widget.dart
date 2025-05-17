@@ -203,43 +203,37 @@ class _BoardWidgetState extends State<BoardWidget> {
       }
     });
 
-    return Container(
-      decoration: const BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage("assets/background/colorful-gradient.jpg"),
-              fit: BoxFit.cover)),
-      child: Stack(
-        children: [
-          // Deck
-          Positioned(
-            top: _positions.getPosition(BoardLocations.deck).top,
-            left: _positions.getPosition(BoardLocations.deck).left,
-            child: DeckWidget(
-                briscola: context.read<PlayScreenController>().briscola,
-                showDeck: context.read<PlayScreenController>().showDeck),
-          ),
-          ..._cardsWidgetsCreated.map((card) => MovingCardWidget(
-              position: card.position,
-              card: card.card,
-              controller: card.controller,
-              onMoveComplete: card.onMoveEnd,
-              onTap: () async {
-                if (card.isTappable &&
-                    shouldUserChooseCard &&
-                    !controller.hasUserChosenCard) {
-                  controller.hasUserChosenCard = true;
-                  await _playUserChosenCard(card.card);
-                }
-              })),
-          if (shouldShowEndOfGameWindow)
-            EndGameWidget(
-              result: context.read<PlayScreenController>().result,
-              points: context.read<PlayScreenController>().points,
-              cardWidgetsCreated: _cardsWidgetsCreated,
-              cardsCreated: _widgetsOfCardsCreated,
-            )
-        ],
-      ),
+    return Stack(
+      children: [
+        // Deck
+        Positioned(
+          top: _positions.getPosition(BoardLocations.deck).top,
+          left: _positions.getPosition(BoardLocations.deck).left,
+          child: DeckWidget(
+              briscola: context.read<PlayScreenController>().briscola,
+              showDeck: context.read<PlayScreenController>().showDeck),
+        ),
+        ..._cardsWidgetsCreated.map((card) => MovingCardWidget(
+            position: card.position,
+            card: card.card,
+            controller: card.controller,
+            onMoveComplete: card.onMoveEnd,
+            onTap: () async {
+              if (card.isTappable &&
+                  shouldUserChooseCard &&
+                  !controller.hasUserChosenCard) {
+                controller.hasUserChosenCard = true;
+                await _playUserChosenCard(card.card);
+              }
+            })),
+        if (shouldShowEndOfGameWindow)
+          EndGameWidget(
+            result: context.read<PlayScreenController>().result,
+            points: context.read<PlayScreenController>().points,
+            cardWidgetsCreated: _cardsWidgetsCreated,
+            cardsCreated: _widgetsOfCardsCreated,
+          )
+      ],
     );
   }
 }
