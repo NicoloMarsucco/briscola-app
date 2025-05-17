@@ -29,9 +29,9 @@ class CustomTextStyles {
 
   /// The font of the quote on the homepage.
   TextStyle get homeScreenQuote => GoogleFonts.ubuntu(
-      color: Colors.white, fontSize: 20, fontStyle: FontStyle.italic);
+      color: Colors.white, fontSize: 25, fontStyle: FontStyle.italic);
 
   /// The font of the quote signature on the homepage.
   TextStyle get homeScreenSignature => GoogleFonts.ubuntu(
-      color: Colors.white, fontSize: 20, fontStyle: FontStyle.normal);
+      color: Colors.white, fontSize: 18, fontStyle: FontStyle.normal);
 }
