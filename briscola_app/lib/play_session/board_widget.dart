@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:briscola_app/audio/audio_controller.dart';
+import 'package:briscola_app/audio/sounds.dart';
 import 'package:briscola_app/game_internals/human_player.dart';
 import 'package:briscola_app/game_internals/player.dart';
 import 'package:briscola_app/game_internals/playing_card.dart';
@@ -12,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flip_card/controllers/flip_card_controllers.dart';
 import 'package:provider/provider.dart';
 
+/// The board where the game is played.
 class BoardWidget extends StatefulWidget {
   const BoardWidget({super.key});
 
@@ -20,7 +23,9 @@ class BoardWidget extends StatefulWidget {
 }
 
 class _BoardWidgetState extends State<BoardWidget> {
+  /// The coordinates of the locations where cards may go.
   final CardPositions _positions = CardPositions();
+
   final CardPositionsController _positionController = CardPositionsController();
 
   final List<MovingCardData> _cardsWidgetsCreated = [];
@@ -28,26 +33,25 @@ class _BoardWidgetState extends State<BoardWidget> {
   bool _isDistributing = false;
   bool _isCollecting = false;
   bool _isPlaying = false;
-  bool _hasInitializedPositions = false;
 
-  // Animation times
+  /// Time to allow [PlayingCardWidget]s to be rendered.
   static const _timeForCardToBuild = Duration(milliseconds: 50);
+
   static const _pauseBetweenCardsDistribution = Duration(milliseconds: 200);
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    if (!_hasInitializedPositions) {
-      _positions.initialize(context); // Safe here
-      _hasInitializedPositions = true;
-    }
+    _positions.initialize(context);
   }
 
   Future<void> _distributeCards() async {
     if (_isDistributing) {
       return;
     }
+
+    final audioController = context.read<AudioController>();
+
     _isDistributing = true;
     final deckPosition = _positions.getPosition(BoardLocations.deck);
     final orderderPlayers = context.read<PlayScreenController>().orderedPlayers;
@@ -87,6 +91,7 @@ class _BoardWidgetState extends State<BoardWidget> {
         await Future.delayed(_timeForCardToBuild);
 
         // Distribute card
+        audioController.playSfx(SfxType.deal);
         setState(() {
           cardData.position = targetPosition;
         });
@@ -107,6 +112,7 @@ class _BoardWidgetState extends State<BoardWidget> {
       return;
     }
     _isPlaying = true;
+    final isDeckShown = context.read<PlayScreenController>().showDeck;
     final PlayingCard cardPlayed =
         context.read<PlayScreenController>().cardPlayedByBot;
     final widgetPointer =
@@ -114,9 +120,12 @@ class _BoardWidgetState extends State<BoardWidget> {
     widgetPointer.onMoveEnd =
         context.read<PlayScreenController>().botPlayCompleter;
     setState(() {
-      widgetPointer.position = _positions.getPosition(BoardLocations.table, 0);
+      widgetPointer.position = _positions.getPosition(
+          isDeckShown ? BoardLocations.table : BoardLocations.tableWithNoDeck,
+          0);
     });
-    await Future.delayed(Duration(milliseconds: 200));
+    _playCardDroppedSound();
+    await Future.delayed(Duration(milliseconds: 100));
     widgetPointer.controller.flipcard();
     _positionController.freeHandSpot(true, cardPlayed);
     _isPlaying = false;
@@ -127,6 +136,7 @@ class _BoardWidgetState extends State<BoardWidget> {
       return;
     }
     _isPlaying = true;
+    final isDeckShown = context.read<PlayScreenController>().showDeck;
     final controllerCompleter =
         context.read<PlayScreenController>().userPlayCompleter;
     final widgetPointer =
@@ -134,12 +144,21 @@ class _BoardWidgetState extends State<BoardWidget> {
     final momentaryCompleter = Completer<void>();
     widgetPointer.onMoveEnd = momentaryCompleter;
     setState(() {
-      widgetPointer.position = _positions.getPosition(BoardLocations.table, 1);
+      widgetPointer.position = _positions.getPosition(
+          isDeckShown ? BoardLocations.table : BoardLocations.tableWithNoDeck,
+          1);
     });
+    _playCardDroppedSound();
     await momentaryCompleter.future;
     controllerCompleter.complete(cardPlayed);
     _isPlaying = false;
     _positionController.freeHandSpot(false, cardPlayed);
+  }
+
+  Future<void> _playCardDroppedSound() async {
+    final audioController = context.read<AudioController>();
+    Future.delayed(const Duration(milliseconds: 80));
+    audioController.playSfx(SfxType.drop);
   }
 
   Future<void> _collectCards() async {
@@ -174,6 +193,9 @@ class _BoardWidgetState extends State<BoardWidget> {
   @override
   Widget build(BuildContext context) {
     //Flags to trigger animations
+
+    final controller = context.watch<PlayScreenController>();
+
     bool shouldDistribute = context.select<PlayScreenController, bool>(
         (controller) => controller.shouldDistribute);
     bool shouldPlayBotCard = context.select<PlayScreenController, bool>(
@@ -195,40 +217,37 @@ class _BoardWidgetState extends State<BoardWidget> {
       }
     });
 
-    return Container(
-      decoration: const BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage("assets/background/colorful-gradient.jpg"),
-              fit: BoxFit.cover)),
-      child: Stack(
-        children: [
-          // Deck
-          Positioned(
-            top: _positions.getPosition(BoardLocations.deck).top,
-            left: _positions.getPosition(BoardLocations.deck).left,
-            child: DeckWidget(
-                briscola: context.read<PlayScreenController>().briscola,
-                showDeck: context.read<PlayScreenController>().showDeck),
-          ),
-          ..._cardsWidgetsCreated.map((card) => MovingCardWidget(
-              position: card.position,
-              card: card.card,
-              controller: card.controller,
-              onMoveComplete: card.onMoveEnd,
-              onTap: () async {
-                if (card.isTappable && shouldUserChooseCard) {
-                  await _playUserChosenCard(card.card);
-                }
-              })),
-          if (shouldShowEndOfGameWindow)
-            EndGameWidget(
-              result: context.read<PlayScreenController>().result,
-              points: context.read<PlayScreenController>().points,
-              cardWidgetsCreated: _cardsWidgetsCreated,
-              cardsCreated: _widgetsOfCardsCreated,
-            )
-        ],
-      ),
+    return Stack(
+      children: [
+        // Deck
+        Positioned(
+          top: _positions.getPosition(BoardLocations.deck).top,
+          left: _positions.getPosition(BoardLocations.deck).left,
+          child: DeckWidget(
+              briscola: context.read<PlayScreenController>().briscola,
+              showDeck: context.read<PlayScreenController>().showDeck),
+        ),
+        ..._cardsWidgetsCreated.map((card) => MovingCardWidget(
+            position: card.position,
+            card: card.card,
+            controller: card.controller,
+            onMoveComplete: card.onMoveEnd,
+            onTap: () async {
+              if (card.isTappable &&
+                  shouldUserChooseCard &&
+                  !controller.hasUserChosenCard) {
+                controller.hasUserChosenCard = true;
+                await _playUserChosenCard(card.card);
+              }
+            })),
+        if (shouldShowEndOfGameWindow)
+          EndGameWidget(
+            result: context.read<PlayScreenController>().result,
+            points: context.read<PlayScreenController>().points,
+            cardWidgetsCreated: _cardsWidgetsCreated,
+            cardsCreated: _widgetsOfCardsCreated,
+          )
+      ],
     );
   }
 }

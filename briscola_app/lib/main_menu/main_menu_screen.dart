@@ -1,3 +1,5 @@
+import 'package:briscola_app/main_menu/main_menu_quote.dart';
+import 'package:briscola_app/main_menu/random_quote_provider.dart';
 import 'package:briscola_app/style/app_button_widget.dart';
 import 'package:briscola_app/style/custom_text_styles.dart';
 import 'package:briscola_app/style/palette.dart';
@@ -13,16 +15,33 @@ class MainMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
     final customTextStyles = context.watch<CustomTextStyles>();
+    final MainMenuQuote quote = RandomQuoteProvider.getRandomQuote();
 
     return Scaffold(
       backgroundColor: palette.backgroundMain,
       body: ResponsiveScreen(
-        squarishMainArea: Center(
-          child: Text(
-            'Briscola \nApp',
-            textAlign: TextAlign.center,
-            style: customTextStyles.mainMenuTitle,
-          ),
+        squarishMainArea: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Briscola\nLab',
+              textAlign: TextAlign.center,
+              style: customTextStyles.mainMenuTitle,
+            ),
+            const SizedBox(
+              height: 40,
+            ),
+            Text(
+              quote.getFormattedQuote(),
+              textAlign: TextAlign.center,
+              style: customTextStyles.homeScreenQuote,
+            ),
+            Text(
+              quote.getFormattedAuthor(),
+              textAlign: TextAlign.center,
+              style: customTextStyles.homeScreenSignature,
+            )
+          ],
         ),
         rectangularMenuArea: Column(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -38,7 +57,6 @@ class MainMenuScreen extends StatelessWidget {
             SizedBox(height: 50)
           ],
         ),
-        backgroundImage: "assets/background/colorful-gradient.jpg",
       ),
     );
   }

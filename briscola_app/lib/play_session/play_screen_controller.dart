@@ -21,6 +21,9 @@ class PlayScreenController extends ChangeNotifier {
   GameResult _result = GameResult.loss;
   final Game _game;
 
+  /// Boolean to track whether the user has already selected a carc. Created to prevent the user from playing multiple cards in the same round.
+  bool hasUserChosenCard = true;
+
   // Completers to tell the backend when the animations are done
   Completer<void> _distributionCompleter = Completer<void>();
   Completer<void> _botPlayCompleter = Completer<void>();
@@ -61,6 +64,7 @@ class PlayScreenController extends ChangeNotifier {
 
   // API to wait for the user input
   Future<PlayingCard> makeUserChooseCard() async {
+    hasUserChosenCard = false;
     if (_userPlayCompleter.isCompleted) {
       _userPlayCompleter = Completer<PlayingCard>();
     }
