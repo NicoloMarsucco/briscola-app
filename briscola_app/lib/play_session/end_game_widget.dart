@@ -1,3 +1,5 @@
+import 'package:briscola_app/audio/audio_controller.dart';
+import 'package:briscola_app/audio/sounds.dart';
 import 'package:briscola_app/game_internals/playing_card.dart';
 import 'package:briscola_app/play_session/board_widget.dart';
 import 'package:briscola_app/play_session/play_screen_controller.dart';
@@ -36,6 +38,10 @@ class EndGameWidget extends StatelessWidget {
     final customTextStyles = context.watch<CustomTextStyles>();
     final palette = context.watch<Palette>();
     final controller = context.read<PlayScreenController>();
+    final audioController = context.read<AudioController>();
+
+    audioController
+        .playSfx(result == GameResult.win ? SfxType.cheer : SfxType.gameOver);
 
     return Center(
       child: Container(
@@ -59,6 +65,8 @@ class EndGameWidget extends StatelessWidget {
                 AppButtonWidget(
                   text: "MAIN MENU",
                   onPressed: () {
+                    audioController.stopAllSound();
+                    audioController.startOrResumeMusic();
                     GoRouter.of(context).go('/');
                   },
                   palette: palette,
@@ -67,6 +75,7 @@ class EndGameWidget extends StatelessWidget {
                 AppButtonWidget(
                   text: "NEW GAME",
                   onPressed: () {
+                    audioController.stopAllSound();
                     _cardWidgetsCreated.clear();
                     _widgetsOfCardsCreated.clear();
                     controller.startNewGame();

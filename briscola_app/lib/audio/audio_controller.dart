@@ -57,7 +57,7 @@ class AudioController {
   void attachDependencies(AppLifecycleStateNotifier lifecycleNotifier,
       SettingsController settings) {
     _attachLifeCycleNotifier(lifecycleNotifier);
-    _startOrResumeMusic();
+    startOrResumeMusic();
   }
 
   void dispose() {
@@ -114,10 +114,10 @@ class AudioController {
     // This assumes there is only a limited number of sound effects in the game.
     // If there are hundreds of long sound effect files, it's better
     // to be more selective when preloading.
-    /*  await AudioCache.instance.loadAll(SfxType.values
+    await AudioCache.instance.loadAll(SfxType.values
         .expand(soundTypeToFilename)
         .map((path) => 'sfx/$path')
-        .toList()); */
+        .toList());
   }
 
   void stopAllSound() {
@@ -135,14 +135,14 @@ class AudioController {
       case AppLifecycleState.hidden:
         stopAllSound();
       case AppLifecycleState.resumed:
-        _startOrResumeMusic();
+        startOrResumeMusic();
       case AppLifecycleState.inactive:
         // No need to react to this state change.
         break;
     }
   }
 
-  void _startOrResumeMusic() async {
+  void startOrResumeMusic() async {
     if (_musicPlayer.source == null) {
       _log.info('No music source set. '
           'Start playing the current song in playlist.');

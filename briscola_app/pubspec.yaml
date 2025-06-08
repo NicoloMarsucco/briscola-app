@@ -70,6 +70,7 @@ flutter:
   assets:
     - assets/cards/
     - assets/music/
+    - assets/sfx/
     - assets/quotes/quotes.json
 
   # An image asset can refer to one or more resolution-specific "variants", see

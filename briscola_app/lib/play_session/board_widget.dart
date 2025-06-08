@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:briscola_app/audio/audio_controller.dart';
+import 'package:briscola_app/audio/sounds.dart';
 import 'package:briscola_app/game_internals/human_player.dart';
 import 'package:briscola_app/game_internals/player.dart';
 import 'package:briscola_app/game_internals/playing_card.dart';
@@ -47,6 +49,9 @@ class _BoardWidgetState extends State<BoardWidget> {
     if (_isDistributing) {
       return;
     }
+
+    final audioController = context.read<AudioController>();
+
     _isDistributing = true;
     final deckPosition = _positions.getPosition(BoardLocations.deck);
     final orderderPlayers = context.read<PlayScreenController>().orderedPlayers;
@@ -86,6 +91,7 @@ class _BoardWidgetState extends State<BoardWidget> {
         await Future.delayed(_timeForCardToBuild);
 
         // Distribute card
+        audioController.playSfx(SfxType.deal);
         setState(() {
           cardData.position = targetPosition;
         });
@@ -118,7 +124,8 @@ class _BoardWidgetState extends State<BoardWidget> {
           isDeckShown ? BoardLocations.table : BoardLocations.tableWithNoDeck,
           0);
     });
-    await Future.delayed(Duration(milliseconds: 200));
+    _playCardDroppedSound();
+    await Future.delayed(Duration(milliseconds: 100));
     widgetPointer.controller.flipcard();
     _positionController.freeHandSpot(true, cardPlayed);
     _isPlaying = false;
@@ -141,10 +148,17 @@ class _BoardWidgetState extends State<BoardWidget> {
           isDeckShown ? BoardLocations.table : BoardLocations.tableWithNoDeck,
           1);
     });
+    _playCardDroppedSound();
     await momentaryCompleter.future;
     controllerCompleter.complete(cardPlayed);
     _isPlaying = false;
     _positionController.freeHandSpot(false, cardPlayed);
+  }
+
+  Future<void> _playCardDroppedSound() async {
+    final audioController = context.read<AudioController>();
+    Future.delayed(const Duration(milliseconds: 80));
+    audioController.playSfx(SfxType.drop);
   }
 
   Future<void> _collectCards() async {
