@@ -1,3 +1,4 @@
+import 'package:briscola_app/audio/audio_controller.dart';
 import 'package:briscola_app/game_internals/bot.dart';
 import 'package:briscola_app/game_internals/game.dart';
 import 'package:briscola_app/game_internals/human_player.dart';
@@ -17,6 +18,11 @@ final router = GoRouter(
         GoRoute(
           path: 'play',
           builder: (context, state) {
+            // Pause music
+            final audioController =
+                Provider.of<AudioController>(context, listen: false);
+            audioController.stopAllSound();
+
             final botPlayer = Bot(name: 'Bot');
             final humanPlayer = HumanPlayer(name: 'Bob');
             final game = Game(players: [botPlayer, humanPlayer]);

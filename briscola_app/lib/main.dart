@@ -8,8 +8,10 @@ import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
 import 'app_lifecycle/app_lifecycle.dart';
+import 'audio/audio_controller.dart';
 import 'main_menu/random_quote_provider.dart';
 import 'router.dart';
+import 'settings/settings.dart';
 import 'style/palette.dart';
 
 Future<void> main() async {
@@ -48,8 +50,21 @@ class MyApp extends StatelessWidget {
     return AppLifecycleObserver(
         child: MultiProvider(
       providers: [
+        Provider(create: (context) => SettingsController()),
         Provider(create: (context) => Palette()),
-        Provider(create: (context) => CustomTextStyles())
+        Provider(create: (context) => CustomTextStyles()),
+        // Set up audio.
+        ProxyProvider2<AppLifecycleStateNotifier, SettingsController,
+            AudioController>(
+          create: (context) => AudioController(),
+          update: (context, lifecycleNotifier, settings, audio) {
+            audio!.attachDependencies(lifecycleNotifier, settings);
+            return audio;
+          },
+          dispose: (context, audio) => audio.dispose(),
+          // Ensures that music starts immediately.
+          lazy: false,
+        ),
       ],
       child: Builder(builder: (context) {
         final palette = context.watch<Palette>();
