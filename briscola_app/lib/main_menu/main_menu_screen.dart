@@ -46,15 +46,18 @@ class MainMenuScreen extends StatelessWidget {
         rectangularMenuArea: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            AppButtonWidget(
-              text: "Play",
-              onPressed: () {
-                GoRouter.of(context).go('/play');
-              },
-              palette: palette,
-              textStyles: customTextStyles,
+            SizedBox(
+              width: 150,
+              child: AppButtonWidget(
+                text: "Play",
+                onPressed: () {
+                  GoRouter.of(context).go('/play');
+                },
+                palette: palette,
+                textStyles: customTextStyles,
+              ),
             ),
-            SizedBox(height: 50)
+            SizedBox(height: 80)
           ],
         ),
       ),
