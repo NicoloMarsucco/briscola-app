@@ -27,8 +27,11 @@ class CustomTextStyles {
       );
 
   /// The font of the buttons in the game
-  TextStyle get buttonText =>
-      GoogleFonts.ubuntu(fontSize: 30, fontWeight: FontWeight.w700);
+  TextStyle get buttonText => GoogleFonts.ubuntu(
+        fontSize: 30,
+        fontWeight: FontWeight.w700,
+        color: Palette.defaultBlue,
+      );
 
   /// The font of the quote on the homepage.
   TextStyle get homeScreenQuote => GoogleFonts.ubuntu(

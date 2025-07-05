@@ -12,7 +12,7 @@ class AppButtonWidget extends StatefulWidget {
 
   static const double _horizontalPadding = 20;
   static const double _verticalPadding = 10;
-  static const double _borderRadius = 13;
+  static const double _borderRadius = 30;
   static const Color _defaultTextColor = Palette.defaultBlue;
 
   const AppButtonWidget({
@@ -125,7 +125,12 @@ class _AppButtonWidgetState extends State<AppButtonWidget>
                             AppButtonWidget._defaultTextColor,
                         letterSpacing: _scaleAnimation.value * 0.5,
                       ),
-                      child: Text(widget.text),
+                      child: Text(
+                        widget.text,
+                        style: widget.textStyles.buttonText.copyWith(
+                            color: widget.textColor ??
+                                AppButtonWidget._defaultTextColor),
+                      ),
                     ),
                   ),
                 ),
