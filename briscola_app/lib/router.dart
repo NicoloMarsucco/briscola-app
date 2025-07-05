@@ -12,7 +12,7 @@ final router = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) {
-        return const MainMenuScreen();
+        return MainMenuScreen();
       },
       routes: [
         GoRoute(
