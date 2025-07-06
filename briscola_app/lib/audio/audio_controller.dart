@@ -109,6 +109,12 @@ class AudioController {
 
   /// Plays a single sound effect, defined by [type].
   void playSfx(SfxType type) {
+    final soundsOn = _settings?.soundsOn.value ?? false;
+    if (!soundsOn) {
+      _log.fine(() => 'Ignoring playing sound ($type) because audio is muted');
+      return;
+    }
+
     _log.fine(() => 'Playing sound: $type');
     final options = soundTypeToFilename(type);
     final filename = options[_random.nextInt(options.length)];

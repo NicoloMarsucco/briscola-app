@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   static const double _horizontalPadding = 20;
+  static const double _horizontalPaddingRows = 8;
 
   const SettingsScreen({super.key});
 
@@ -40,6 +41,13 @@ class SettingsScreen extends StatelessWidget {
                       title: "Music",
                       value: musicOn,
                       onChanged: (_) => settings.toggleMusicOn(),
+                    )),
+            ValueListenableBuilder<bool>(
+                valueListenable: settings.soundsOn,
+                builder: (context, soundsOn, child) => _SettingsSwitchLine(
+                      title: "Sound effects",
+                      value: soundsOn,
+                      onChanged: (_) => settings.toggleSoundsOn(),
                     ))
           ],
         ),
@@ -86,7 +94,8 @@ class _SettingsSwitchLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(
+          horizontal: SettingsScreen._horizontalPaddingRows),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
