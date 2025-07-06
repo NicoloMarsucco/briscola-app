@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:briscola_app/play_session/card_positions_controller.dart';
 import 'package:briscola_app/play_session/playing_card_widget.dart';
 import 'package:flutter/widgets.dart';
@@ -68,7 +70,9 @@ class CardPositions {
   /// Initializes the paddings determined at runtime.
   void _initializePaddings(double width, double height) {
     _verticalPadding = height < 660 ? 30 : 60;
-    _horizontalPaddingHand = width < 320 ? 30 : 60;
+    //_horizontalPaddingHand = width < 320 ? 30 : 60;
+    _horizontalPaddingHand =
+        lerpDouble(10, 60, clampDouble((width - 200) / 320, 0, 1))!;
   }
 
   /// Calculates the coordinates of the deck.

@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class MainMenuScreen extends StatelessWidget {
-  const MainMenuScreen({super.key});
+  MainMenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +19,17 @@ class MainMenuScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: palette.backgroundMain,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        actions: [
+          IconButton(
+              onPressed: () => GoRouter.of(context).go('/settings'),
+              icon: Icon(
+                Icons.settings,
+                color: palette.defaultWhite,
+              ))
+        ],
+      ),
       body: ResponsiveScreen(
         squarishMainArea: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -46,15 +57,18 @@ class MainMenuScreen extends StatelessWidget {
         rectangularMenuArea: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            AppButtonWidget(
-              text: "Play",
-              onPressed: () {
-                GoRouter.of(context).go('/play');
-              },
-              palette: palette,
-              textStyles: customTextStyles,
+            SizedBox(
+              width: 150,
+              child: AppButtonWidget(
+                text: "Play",
+                onPressed: () {
+                  GoRouter.of(context).go('/play');
+                },
+                palette: palette,
+                textStyles: customTextStyles,
+              ),
             ),
-            SizedBox(height: 50)
+            SizedBox(height: 80)
           ],
         ),
       ),

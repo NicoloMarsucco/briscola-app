@@ -16,12 +16,13 @@ class EndGameWidget extends StatelessWidget {
   final int points;
   final List<MovingCardData> _cardWidgetsCreated;
   final Set<PlayingCard> _widgetsOfCardsCreated;
-  static const double height = 200;
-  static const double width = 300;
+  static const double height = 300;
+  static const double width = 280;
+  static const double buttonWidth = 200;
   static const Map<GameResult, String> _message = {
-    GameResult.win: "YOU WON!",
-    GameResult.draw: "YOU DREW!",
-    GameResult.loss: "YOU LOST!"
+    GameResult.win: "You won!",
+    GameResult.draw: "You drew!",
+    GameResult.loss: "You lost!"
   };
 
   const EndGameWidget(
@@ -48,22 +49,26 @@ class EndGameWidget extends StatelessWidget {
           height: height,
           width: width,
           decoration: BoxDecoration(
-              border: Border.all(width: 3),
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16)),
+              color: Colors.white, borderRadius: BorderRadius.circular(30)),
           child: Center(
               child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildRainbowEndGameMessage(
-                  _message[result] ?? "", customTextStyles.endGameTitle),
               Text(
-                "POINTS: $points",
+                _message[result] ?? "",
+                style: customTextStyles.endGameMessage.copyWith(fontSize: 40),
+              ),
+              Text(
+                "Points: $points",
                 style: customTextStyles.endGameMessage,
               ),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                AppButtonWidget(
-                  text: "MAIN MENU",
+              SizedBox(
+                height: 30,
+              ),
+              SizedBox(
+                width: buttonWidth,
+                child: AppButtonWidget(
+                  text: "Main Menu",
                   onPressed: () {
                     audioController.stopAllSound();
                     audioController.startOrResumeMusic();
@@ -72,8 +77,14 @@ class EndGameWidget extends StatelessWidget {
                   palette: palette,
                   textStyles: customTextStyles,
                 ),
-                AppButtonWidget(
-                  text: "NEW GAME",
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                width: buttonWidth,
+                child: AppButtonWidget(
+                  text: "New Game",
                   onPressed: () {
                     audioController.stopAllSound();
                     _cardWidgetsCreated.clear();
@@ -82,39 +93,10 @@ class EndGameWidget extends StatelessWidget {
                   },
                   palette: palette,
                   textStyles: customTextStyles,
-                )
-              ])
+                ),
+              )
             ],
           ))),
-    );
-  }
-
-  static Widget _buildRainbowEndGameMessage(
-      String message, TextStyle baseStyle) {
-    final Gradient rainbowGradient = LinearGradient(
-      colors: [
-        Colors.red,
-        Colors.orange,
-        Colors.yellow,
-        Colors.green,
-        Colors.blue,
-        Colors.indigo,
-        Colors.purple,
-      ],
-      begin: Alignment.centerLeft,
-      end: Alignment.centerRight,
-    );
-
-    return ShaderMask(
-      blendMode: BlendMode.srcIn,
-      shaderCallback: (Rect bounds) {
-        return rainbowGradient.createShader(bounds);
-      },
-      child: Text(
-        message,
-        style: baseStyle,
-        textAlign: TextAlign.center,
-      ),
     );
   }
 }

@@ -22,7 +22,7 @@ class AudioController {
   /// sound effects.
   final List<AudioPlayer> _sfxPlayers;
 
-  int currentSfxPlayer = 0;
+  SettingsController? _settings;
 
   final Queue<Song> _playlist;
 
@@ -57,6 +57,7 @@ class AudioController {
   void attachDependencies(AppLifecycleStateNotifier lifecycleNotifier,
       SettingsController settings) {
     _attachLifeCycleNotifier(lifecycleNotifier);
+    _attachSettings(settings);
     startOrResumeMusic();
   }
 
@@ -78,8 +79,42 @@ class AudioController {
     _lifecycleNotifier = lifecycleNotifier;
   }
 
+  /// Enables [AudioController] to track changes to settings.
+  void _attachSettings(SettingsController settingsController) {
+    if (_settings == settingsController) {
+      // Already attached to this instance. Nothing to do.
+      return;
+    }
+
+    // Remove handlers from the old settings controller if present
+    final oldSettings = _settings;
+    if (oldSettings != null) {
+      oldSettings.musicOn.removeListener(_musicOnHandler);
+    }
+
+    _settings = settingsController;
+
+    // Add handlers
+    settingsController.musicOn.addListener(_musicOnHandler);
+  }
+
+  void _musicOnHandler() {
+    if (_settings!.musicOn.value) {
+      startOrResumeMusic();
+    } else {
+      // Music got turned off.
+      _musicPlayer.pause();
+    }
+  }
+
   /// Plays a single sound effect, defined by [type].
   void playSfx(SfxType type) {
+    final soundsOn = _settings?.soundsOn.value ?? false;
+    if (!soundsOn) {
+      _log.fine(() => 'Ignoring playing sound ($type) because audio is muted');
+      return;
+    }
+
     _log.fine(() => 'Playing sound: $type');
     final options = soundTypeToFilename(type);
     final filename = options[_random.nextInt(options.length)];
@@ -135,7 +170,9 @@ class AudioController {
       case AppLifecycleState.hidden:
         stopAllSound();
       case AppLifecycleState.resumed:
-        startOrResumeMusic();
+        if (_settings!.musicOn.value) {
+          startOrResumeMusic();
+        }
       case AppLifecycleState.inactive:
         // No need to react to this state change.
         break;
