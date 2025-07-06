@@ -8,10 +8,17 @@ class Palette {
   Color get backgroundMain => const Color.fromARGB(255, 6, 3, 35);
 
   /// The primary colour used throughout the app.
+  @Deprecated("Use [primaryColor] for consistency")
   static const Color defaultBlue = Color.fromARGB(255, 6, 3, 35);
+
+  /// The main colour used throughout the app.
+  Color get primaryColor => const Color.fromARGB(255, 6, 3, 35);
 
   /// The colour used for text shadows
   static const Color primaryShadow = Colors.red;
+
+  // Default shade of white
+  Color get defaultWhite => const Color.fromRGBO(255, 255, 255, 1);
 
   // Buttons
   Color get defaultButtonBackground => const Color.fromRGBO(255, 255, 255, 1);

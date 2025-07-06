@@ -58,4 +58,17 @@ class CustomTextStyles {
               color: Colors.red,
             ),
           ]);
+
+  /// The font of the settings header.
+  TextStyle get settingsHeader => GoogleFonts.ubuntu(
+      color: Colors.white,
+      fontStyle: FontStyle.normal,
+      fontSize: 30,
+      fontWeight: FontWeight.bold);
+
+  /// The font of a settings entry
+  TextStyle get settingsEntry => GoogleFonts.ubuntu(
+        color: Colors.white,
+        fontSize: 25,
+      );
 }

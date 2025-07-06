@@ -19,6 +19,17 @@ class MainMenuScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: palette.backgroundMain,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        actions: [
+          IconButton(
+              onPressed: () => GoRouter.of(context).go('/settings'),
+              icon: Icon(
+                Icons.settings,
+                color: palette.defaultWhite,
+              ))
+        ],
+      ),
       body: ResponsiveScreen(
         squarishMainArea: Column(
           mainAxisAlignment: MainAxisAlignment.center,
