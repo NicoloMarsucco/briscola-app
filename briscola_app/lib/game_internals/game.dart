@@ -10,7 +10,6 @@ class Game {
   late GameHistory gameHistory;
   late Suit _suitOfBriscola;
   late final RoundManager _roundManager;
-  bool _isFirstRound = true;
 
   Game({required List<Player> players}) : _players = players {
     _getSuitOfBriscola();
@@ -39,9 +38,8 @@ class Game {
   Suit get suitOfBriscola => _suitOfBriscola;
 
   Future<void> startGame() async {
-    while (!_players.first.isHandEmpty || _isFirstRound) {
+    while (!_players.first.isHandEmpty || gameHistory.history.isEmpty) {
       await _roundManager.startRound();
-      _isFirstRound = false;
     }
     _roundManager.playScreenController
         .showEndOfGameWindow(_players.last.points);
@@ -58,7 +56,6 @@ class Game {
     deck.prepareDeck();
     _resetPlayersPoints();
     _getSuitOfBriscola();
-    _isFirstRound = true;
     gameHistory = GameHistory(
         lastCard: deck.peekLastCard, numberOfPlayers: _players.length);
     _subscribeBotsToHistory();
