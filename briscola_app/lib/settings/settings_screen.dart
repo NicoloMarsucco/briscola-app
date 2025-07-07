@@ -10,6 +10,9 @@ import 'package:provider/provider.dart';
 class SettingsScreen extends StatelessWidget {
   static const double _horizontalPadding = 20;
   static const double _horizontalPaddingRows = 8;
+  static const SizedBox _gap = SizedBox(
+    height: 10,
+  );
 
   const SettingsScreen({super.key});
 
@@ -48,6 +51,15 @@ class SettingsScreen extends StatelessWidget {
                       title: "Sound effects",
                       value: soundsOn,
                       onChanged: (_) => settings.toggleSoundsOn(),
+                    )),
+            _gap,
+            const _SettingsHeader(heading: "Visuals"),
+            ValueListenableBuilder<bool>(
+                valueListenable: settings.showCardsLeft,
+                builder: (context, showCardsLeft, child) => _SettingsSwitchLine(
+                      title: "Show cards left",
+                      value: showCardsLeft,
+                      onChanged: (_) => settings.toggleShowCardsLeft(),
                     ))
           ],
         ),

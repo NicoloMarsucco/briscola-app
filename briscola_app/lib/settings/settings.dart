@@ -15,6 +15,9 @@ class SettingsController {
   /// Whether the sounds effects should be played or not.
   ValueNotifier<bool> soundsOn = ValueNotifier(true);
 
+  /// Whether to show the number of cards left during a game.
+  ValueNotifier<bool> showCardsLeft = ValueNotifier(true);
+
   /// Creates a new instance of [SettingsController] backed by [store].
   SettingsController({SettingsPersistence? store})
       : _store = store ?? LocalStorageSettingsPersistence() {
@@ -31,6 +34,11 @@ class SettingsController {
     _store.saveSoundsOn(soundsOn.value);
   }
 
+  void toggleShowCardsLeft() {
+    showCardsLeft.value = !showCardsLeft.value;
+    _store.saveShowCardsLeft(showCardsLeft.value);
+  }
+
   /// Asynchronously loads values from the injected persistence store.
   Future<void> _loadStateFromPersistence() async {
     final loadedValues = await Future.wait([
@@ -38,6 +46,9 @@ class SettingsController {
           .getMusicOn(defaultValue: true)
           .then((value) => musicOn.value = value),
       _store.getSoundsOn(defaultValue: true).then((value) => soundsOn.value),
+      _store
+          .getShowCardsLeft(defaultValue: true)
+          .then((value) => showCardsLeft.value = value),
     ]);
     _log.fine(() => "Loaded settings: $loadedValues");
   }
