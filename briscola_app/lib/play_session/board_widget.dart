@@ -10,6 +10,9 @@ import 'package:briscola_app/play_session/deck_widget.dart';
 import 'package:briscola_app/play_session/end_game_widget.dart';
 import 'package:briscola_app/play_session/moving_card_widget.dart';
 import 'package:briscola_app/play_session/play_screen_controller.dart';
+import 'package:briscola_app/play_session/playing_card_widget.dart';
+import 'package:briscola_app/settings/settings.dart';
+import 'package:briscola_app/style/custom_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flip_card/controllers/flip_card_controllers.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +41,9 @@ class _BoardWidgetState extends State<BoardWidget> {
   static const _timeForCardToBuild = Duration(milliseconds: 50);
 
   static const _pauseBetweenCardsDistribution = Duration(milliseconds: 200);
+
+  /// The number of cards left in the deck.
+  int _cardsLeft = 40;
 
   @override
   void didChangeDependencies() {
@@ -93,6 +99,7 @@ class _BoardWidgetState extends State<BoardWidget> {
         // Distribute card
         audioController.playSfx(SfxType.deal);
         setState(() {
+          _cardsLeft--;
           cardData.position = targetPosition;
         });
 
@@ -193,7 +200,7 @@ class _BoardWidgetState extends State<BoardWidget> {
   @override
   Widget build(BuildContext context) {
     //Flags to trigger animations
-
+    final settings = context.watch<SettingsController>();
     final controller = context.watch<PlayScreenController>();
 
     bool shouldDistribute = context.select<PlayScreenController, bool>(
@@ -216,6 +223,11 @@ class _BoardWidgetState extends State<BoardWidget> {
         _collectCards();
       }
     });
+
+    if (shouldShowEndOfGameWindow) {
+      // Reset in case of a new game.
+      _cardsLeft = 40;
+    }
 
     return Stack(
       children: [
@@ -240,6 +252,21 @@ class _BoardWidgetState extends State<BoardWidget> {
                 await _playUserChosenCard(card.card);
               }
             })),
+        Positioned(
+          top: _positions.getPosition(BoardLocations.deck).top +
+              (PlayingCardWidget.height - _CardsLeft.size) / 2,
+          left: _positions.getPosition(BoardLocations.deck).left +
+              (PlayingCardWidget.width - _CardsLeft.size) / 2,
+          child: ValueListenableBuilder<bool>(
+              valueListenable: settings.showCardsLeft,
+              builder: (context, showCardsLeft, child) {
+                if (showCardsLeft &&
+                    context.read<PlayScreenController>().showDeck) {
+                  return _CardsLeft(_cardsLeft);
+                }
+                return SizedBox();
+              }),
+        ),
         if (shouldShowEndOfGameWindow)
           EndGameWidget(
             result: context.read<PlayScreenController>().result,
@@ -263,4 +290,29 @@ class MovingCardData {
   MovingCardData(
       {required this.card, required this.position, required this.isTappable})
       : key = ValueKey(card.toString());
+}
+
+/// Counter showing the number of cards left.
+class _CardsLeft extends StatelessWidget {
+  final int number;
+  static const double size = 70;
+
+  const _CardsLeft(this.number);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.black, width: 2)),
+      alignment: Alignment.center,
+      child: Text(
+        number.toString(),
+        style: context.read<CustomTextStyles>().cardsLeft,
+      ),
+    );
+  }
 }
