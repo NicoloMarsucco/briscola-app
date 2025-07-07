@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:briscola_app/game_internals/bot.dart';
 import 'package:briscola_app/game_internals/card_strength_comparator.dart';
+import 'package:briscola_app/game_internals/game_history.dart';
 import 'package:briscola_app/game_internals/ordered_players.dart';
 import 'package:briscola_app/play_session/play_screen_controller.dart';
 import 'package:logging/logging.dart';
@@ -88,6 +89,8 @@ class RoundManager {
 
   void _addCardToTable(PlayingCard card, Player player) {
     _cardsOnTheTable.add(card);
+    _game.gameHistory
+        .recordMove(player: player, cards: [card], moveType: MoveType.play);
     if (CardStrengthComparator.isStronger(
         strongestCardOnTheTable: _strongestCardOnTheTable,
         cardPlayed: card,
@@ -104,6 +107,10 @@ class RoundManager {
   Future<void> _collectCards() async {
     _log.info("Collecting cards...");
     _holderOfStrongestCard.collectPlayedCards(_cardsOnTheTable);
+    _game.gameHistory.recordMove(
+        player: _holderOfStrongestCard,
+        cards: _cardsOnTheTable,
+        moveType: MoveType.collect);
     await _playScreenController.collectCards(
         cardsOnTheTable, _holderOfStrongestCard is Bot);
     _cardsOnTheTable.clear();

@@ -18,14 +18,17 @@ final router = GoRouter(
       },
       routes: [
         GoRoute(
-          path: 'play',
+          name: 'play',
+          path: 'play/:difficulty',
           builder: (context, state) {
+            final difficulty = state.pathParameters['difficulty'] ?? 'easy';
+
             // Pause music
             final audioController =
                 Provider.of<AudioController>(context, listen: false);
             audioController.stopAllSound();
 
-            final botPlayer = Bot(name: 'Bot');
+            final botPlayer = Bot(name: 'Bot', difficulty: difficulty);
             final humanPlayer = HumanPlayer(name: 'Bob');
             final game = Game(players: [botPlayer, humanPlayer]);
 

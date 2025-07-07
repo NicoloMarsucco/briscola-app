@@ -71,4 +71,8 @@ class CustomTextStyles {
         color: Colors.white,
         fontSize: 25,
       );
+
+  /// The font of the difficulty selection menu items
+  TextStyle get difficultyMenuEntry =>
+      GoogleFonts.ubuntu(fontSize: 26, fontWeight: FontWeight.bold);
 }
