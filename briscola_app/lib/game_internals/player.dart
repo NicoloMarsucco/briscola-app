@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:briscola_app/game_internals/bot_strategy.dart';
+import 'package:briscola_app/game_internals/strategies/bot_strategy.dart';
 import 'package:briscola_app/game_internals/playing_card.dart';
 import 'package:flutter/foundation.dart';
 

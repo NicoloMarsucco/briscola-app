@@ -62,7 +62,8 @@ class MainMenuScreen extends StatelessWidget {
               child: AppButtonWidget(
                 text: "Play",
                 onPressed: () {
-                  GoRouter.of(context).go('/play');
+                  _showDifficultyDialog(context, customTextStyles);
+                  //GoRouter.of(context).go('/play');
                 },
                 palette: palette,
                 textStyles: customTextStyles,
@@ -70,6 +71,65 @@ class MainMenuScreen extends StatelessWidget {
             ),
             SizedBox(height: 80)
           ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showDifficultyDialog(
+      BuildContext context, CustomTextStyles textStyles) async {
+    await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text(
+            'Select difficulty:',
+            style: textStyles.buttonText,
+            textAlign: TextAlign.center,
+          ),
+          children: [
+            difficultyOption(
+                context: context,
+                text: "Easy",
+                color: Colors.green,
+                textStyles: textStyles,
+                difficultyId: "easy"),
+            difficultyOption(
+                context: context,
+                text: "Medium",
+                color: Colors.orange,
+                textStyles: textStyles,
+                difficultyId: 'medium'),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget difficultyOption({
+    required BuildContext context,
+    required String text,
+    required Color color,
+    required CustomTextStyles textStyles,
+    required String difficultyId,
+  }) {
+    return SimpleDialogOption(
+      padding: EdgeInsets.zero,
+      child: Center(
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () {
+            Navigator.pop(context);
+            context
+                .goNamed('play', pathParameters: {'difficulty': difficultyId});
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Text(
+              text,
+              style: textStyles.buttonText.copyWith(color: color),
+            ),
+          ),
         ),
       ),
     );

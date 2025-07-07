@@ -7,7 +7,7 @@ import 'playing_card.dart';
 class Game {
   final List<Player> _players;
   final Deck deck = Deck();
-  late final GameHistory gameHistory;
+  late GameHistory gameHistory;
   late Suit _suitOfBriscola;
   late final RoundManager _roundManager;
   bool _isFirstRound = true;
@@ -59,7 +59,9 @@ class Game {
     _resetPlayersPoints();
     _getSuitOfBriscola();
     _isFirstRound = true;
-    gameHistory.reset(deck.peekLastCard);
+    gameHistory = GameHistory(
+        lastCard: deck.peekLastCard, numberOfPlayers: _players.length);
+    _subscribeBotsToHistory();
     _roundManager.prepareForNewGame();
     startGame();
   }
