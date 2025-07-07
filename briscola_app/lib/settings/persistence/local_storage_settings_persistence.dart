@@ -28,4 +28,16 @@ class LocalStorageSettingsPersistence extends SettingsPersistence {
     final prefs = await instanceFuture;
     await prefs.setBool('soundsOn', value);
   }
+
+  @override
+  Future<bool> getShowCardsLeft({required bool defaultValue}) async {
+    final prefs = await instanceFuture;
+    return prefs.getBool('showCardsLeft') ?? defaultValue;
+  }
+
+  @override
+  Future<void> saveShowCardsLeft(bool value) async {
+    final prefs = await instanceFuture;
+    prefs.setBool('showCardsLeft', value);
+  }
 }
