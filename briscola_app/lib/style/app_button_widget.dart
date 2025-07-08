@@ -10,7 +10,7 @@ class AppButtonWidget extends StatefulWidget {
   final Palette palette;
   final CustomTextStyles textStyles;
 
-  static const double _horizontalPadding = 20;
+  static const double _horizontalPadding = 15;
   static const double _verticalPadding = 10;
   static const double _borderRadius = 30;
   static const Color _defaultTextColor = Palette.defaultBlue;

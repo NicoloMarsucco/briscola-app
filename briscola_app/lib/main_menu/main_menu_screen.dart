@@ -12,13 +12,12 @@ import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 class MainMenuScreen extends StatelessWidget {
   static final _log = Logger('MainMenuScreen');
 
-  MainMenuScreen({super.key});
+  const MainMenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
-    final customTextStyles = context.watch<CustomTextStyles>();
-    var theme = Theme.of(context);
+    final customTextStyles = context.read<CustomTextStyles>();
     return Scaffold(
         backgroundColor: palette.backgroundMain,
         appBar: AppBar(
@@ -36,16 +35,25 @@ class MainMenuScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Text(
+              "Biscola Arena",
+              style: customTextStyles.mainMenuTitle,
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(
+              height: 49,
+            ),
             Center(child: _heatMapCalendar(context)),
             SizedBox(
-              height: 50,
+              height: 80,
             ),
             SizedBox(
               width: 150,
               child: AppButtonWidget(
                 text: "Play",
                 onPressed: () {
-                  _showDifficultyDialog(context, customTextStyles);
+                  _showDifficultyDialog(
+                      context, customTextStyles, palette.backgroundMain);
                 },
                 palette: palette,
                 textStyles: customTextStyles,
@@ -55,17 +63,21 @@ class MainMenuScreen extends StatelessWidget {
         ));
   }
 
-  Future<void> _showDifficultyDialog(
-      BuildContext context, CustomTextStyles textStyles) async {
+  Future<void> _showDifficultyDialog(BuildContext context,
+      CustomTextStyles textStyles, Color backgroundColor) async {
     await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(
           title: Text(
             'Select difficulty:',
-            style: textStyles.buttonText,
+            style: textStyles.buttonText.copyWith(color: Colors.white),
             textAlign: TextAlign.center,
           ),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+              side: const BorderSide(color: Colors.white, width: 1)),
+          backgroundColor: backgroundColor,
           children: [
             difficultyOption(
                 context: context,
@@ -117,6 +129,7 @@ class MainMenuScreen extends StatelessWidget {
   Widget _heatMapCalendar(BuildContext context) {
     final now = DateTime.now();
     final map = context.watch<HistoryController>().history;
+    final textStyles = context.read<CustomTextStyles>();
     _log.info("The map is now: $map");
 
     return HeatmapCalendar<num>(
@@ -124,32 +137,38 @@ class MainMenuScreen extends StatelessWidget {
       endedDate: DateTime(now.year, now.month, now.day),
       firstDay: DateTime.monday,
       colorMap: Palette.heatmapColorsMap,
+      colorTipNum: 5,
       selectedMap: map,
       monthLabelItemBuilder: (context, date, defaultFormat) {
         return Text(
           DateFormat(defaultFormat).format(date),
-          style: const TextStyle(
-            fontFamily:
-                'Montserrat', // 🎯 **Specify your desired font family here**
-            fontSize:
-                14.0, // You can adjust the size here too, overriding `monthLabelFontSize`
-            fontWeight: FontWeight.bold,
-            color: Colors.deepPurple, // Example color
-          ),
+          style: textStyles.heatmapMonthLabel,
         );
       },
-      cellSize: const Size.square(16.0),
+      weekLabelValueBuilder: (context, protoDate, defaultFormat) {
+        return Text(
+          DateFormat(defaultFormat).format(protoDate),
+          style: textStyles.heatmapWeekLabel,
+        );
+      },
+      cellSize: const Size.square(17.0),
       colorTipCellSize: const Size.square(12.0),
       style: const HeatmapCalendarStyle.defaults(
         cellValueFontSize: 6.0,
         cellRadius: BorderRadius.all(Radius.circular(4.0)),
-        weekLabelValueFontSize: 12.0,
-        monthLabelFontSize: 12.0,
       ),
       layoutParameters: const HeatmapLayoutParameters.defaults(
         monthLabelPosition: CalendarMonthLabelPosition.top,
         weekLabelPosition: CalendarWeekLabelPosition.right,
         colorTipPosition: CalendarColorTipPosition.bottom,
+      ),
+      colorTipLeftHelper: Text(
+        "No games",
+        style: textStyles.heatmapWeekLabel.copyWith(fontSize: 11),
+      ),
+      colorTipRightHelper: Text(
+        "Lots of games",
+        style: textStyles.heatmapWeekLabel.copyWith(fontSize: 11),
       ),
     );
   }

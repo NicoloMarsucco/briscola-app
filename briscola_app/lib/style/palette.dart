@@ -27,11 +27,11 @@ class Palette {
   Color get defaultButtonOverlayColor => Colors.deepPurple;
 
   /// Heatmap colors.
-  static final Map<int, Color> heatmapColorsMap = _generateHeatmapColorsMap(10);
+  static final Map<int, Color> heatmapColorsMap = _generateHeatmapColorsMap(30);
 
   static Map<int, Color> _generateHeatmapColorsMap(int max) {
     final steps = 5;
-    final chosenColor = Colors.deepPurple;
+    final chosenColor = Colors.green;
     final Map<int, Color> map = {};
     final dOpacity = 1 / steps;
     final dGames = (max - 1) / (steps - 1);

@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../style/app_button_widget.dart';
 import '../style/palette.dart';
 
+// TODO: refactor to merge with main menu dialog box.
 class EndGameWidget extends StatelessWidget {
   final GameResult result;
   final int points;
@@ -36,8 +37,8 @@ class EndGameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final customTextStyles = context.watch<CustomTextStyles>();
-    final palette = context.watch<Palette>();
+    final customTextStyles = context.read<CustomTextStyles>();
+    final palette = context.read<Palette>();
     final controller = context.read<PlayScreenController>();
     final audioController = context.read<AudioController>();
 
@@ -49,7 +50,9 @@ class EndGameWidget extends StatelessWidget {
           height: height,
           width: width,
           decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(30)),
+              color: palette.backgroundMain,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Colors.white, width: 1)),
           child: Center(
               child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
