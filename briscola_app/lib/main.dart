@@ -1,5 +1,6 @@
 import 'dart:developer' as dev;
 
+import 'package:briscola_app/history/history.dart';
 import 'package:briscola_app/style/custom_text_styles.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,6 @@ import 'package:provider/provider.dart';
 
 import 'app_lifecycle/app_lifecycle.dart';
 import 'audio/audio_controller.dart';
-import 'main_menu/random_quote_provider.dart';
 import 'router.dart';
 import 'settings/settings.dart';
 import 'style/palette.dart';
@@ -27,9 +27,6 @@ Future<void> main() async {
   });
 
   WidgetsFlutterBinding.ensureInitialized();
-
-// Load the quotes for the main menu.
-  await RandomQuoteProvider.loadQuotes();
 
   // Put game into full screen mode on mobile devices.
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
@@ -53,6 +50,7 @@ class MyApp extends StatelessWidget {
         Provider(create: (context) => SettingsController()),
         Provider(create: (context) => Palette()),
         Provider(create: (context) => CustomTextStyles()),
+        ChangeNotifierProvider(create: (context) => HistoryController()),
         // Set up audio.
         ProxyProvider2<AppLifecycleStateNotifier, SettingsController,
             AudioController>(
@@ -71,7 +69,8 @@ class MyApp extends StatelessWidget {
 
         return MaterialApp.router(
           title: 'Briscola app',
-          theme: ThemeData(scaffoldBackgroundColor: palette.background),
+          theme: ThemeData(
+              scaffoldBackgroundColor: palette.background, useMaterial3: true),
           routerConfig: router,
         );
       }),

@@ -8,11 +8,12 @@ class CustomTextStyles {
         color: Colors.white,
         fontSize: 70,
         fontWeight: FontWeight.w500,
+        height: 1.0,
         shadows: <Shadow>[
           Shadow(
             offset: const Offset(4.0, 4.0),
             blurRadius: 2.0,
-            color: Colors.red,
+            color: Colors.deepPurple,
           ),
         ],
       );
@@ -20,7 +21,7 @@ class CustomTextStyles {
   /// The font of the message shown at the end of each game
   /// (like "You won!")
   TextStyle get endGameMessage =>
-      GoogleFonts.ubuntu(fontSize: 20, color: Palette.defaultBlue);
+      GoogleFonts.ubuntu(fontSize: 20, color: Colors.white);
 
   TextStyle get endGameTitle => GoogleFonts.luckiestGuy(
         fontSize: 48,
@@ -32,32 +33,6 @@ class CustomTextStyles {
         fontWeight: FontWeight.w700,
         color: Palette.defaultBlue,
       );
-
-  /// The font of the quote on the homepage.
-  TextStyle get homeScreenQuote => GoogleFonts.ubuntu(
-          color: Colors.white,
-          fontSize: 25,
-          fontStyle: FontStyle.italic,
-          shadows: <Shadow>[
-            Shadow(
-              offset: const Offset(1.4, 1.4),
-              blurRadius: 3.0,
-              color: Colors.red,
-            ),
-          ]);
-
-  /// The font of the quote signature on the homepage.
-  TextStyle get homeScreenSignature => GoogleFonts.ubuntu(
-          color: Colors.white,
-          fontSize: 18,
-          fontStyle: FontStyle.normal,
-          shadows: <Shadow>[
-            Shadow(
-              offset: const Offset(1.4, 1.4),
-              blurRadius: 3.0,
-              color: Colors.red,
-            ),
-          ]);
 
   /// The font of the settings header.
   TextStyle get settingsHeader => GoogleFonts.ubuntu(
@@ -75,4 +50,16 @@ class CustomTextStyles {
   /// The font of the difficulty selection menu items
   TextStyle get difficultyMenuEntry =>
       GoogleFonts.ubuntu(fontSize: 26, fontWeight: FontWeight.bold);
+
+  /// The font of the number of cards left.
+  TextStyle get cardsLeft => GoogleFonts.ubuntu(
+      fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black);
+
+  /// The month label of the heatmap.
+  TextStyle get heatmapMonthLabel => GoogleFonts.ubuntu(
+      fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green);
+
+  /// The week label of the heatmap.
+  TextStyle get heatmapWeekLabel => GoogleFonts.ubuntu(
+      fontSize: 13, fontWeight: FontWeight.normal, color: Colors.green);
 }

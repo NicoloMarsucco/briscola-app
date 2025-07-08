@@ -180,6 +180,11 @@ class AudioController {
   }
 
   void startOrResumeMusic() async {
+    if (!_settings!.musicOn.value) {
+      _log.info("Music turned off. No music plalying");
+      return;
+    }
+
     if (_musicPlayer.source == null) {
       _log.info('No music source set. '
           'Start playing the current song in playlist.');
