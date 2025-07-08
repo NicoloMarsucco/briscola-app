@@ -1,10 +1,7 @@
 import 'package:briscola_app/history/history.dart';
-import 'package:briscola_app/main_menu/main_menu_quote.dart';
-import 'package:briscola_app/main_menu/random_quote_provider.dart';
 import 'package:briscola_app/style/app_button_widget.dart';
 import 'package:briscola_app/style/custom_text_styles.dart';
 import 'package:briscola_app/style/palette.dart';
-import 'package:briscola_app/style/responsive_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -21,7 +18,6 @@ class MainMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
     final customTextStyles = context.watch<CustomTextStyles>();
-    final MainMenuQuote quote = RandomQuoteProvider.getRandomQuote();
     var theme = Theme.of(context);
     return Scaffold(
         backgroundColor: palette.backgroundMain,
