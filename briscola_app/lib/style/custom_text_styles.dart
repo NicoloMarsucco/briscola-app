@@ -6,7 +6,7 @@ class CustomTextStyles {
   // Main menu
   TextStyle get mainMenuTitle => GoogleFonts.ubuntu(
         color: Colors.white,
-        fontSize: 70,
+        fontSize: 80,
         fontWeight: FontWeight.w500,
         height: 1.0,
         shadows: <Shadow>[

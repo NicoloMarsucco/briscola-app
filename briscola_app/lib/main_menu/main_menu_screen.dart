@@ -31,21 +31,22 @@ class MainMenuScreen extends StatelessWidget {
                 ))
           ],
         ),
+        extendBodyBehindAppBar: true,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              "Biscola Arena",
+              "Biscola\nArena",
               style: customTextStyles.mainMenuTitle,
               textAlign: TextAlign.center,
             ),
             SizedBox(
-              height: 49,
+              height: 70,
             ),
             Center(child: _heatMapCalendar(context)),
             SizedBox(
-              height: 80,
+              height: 70,
             ),
             SizedBox(
               width: 150,
