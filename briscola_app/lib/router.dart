@@ -14,8 +14,7 @@ final router = GoRouter(
     GoRoute(
       path: '/',
       pageBuilder: (context, state) {
-        return FadeTransitionPage(
-            key: state.pageKey, child: const MainMenuScreen());
+        return FadeTransitionPage(key: state.pageKey, child: MainMenuScreen());
       },
       routes: [
         GoRoute(
