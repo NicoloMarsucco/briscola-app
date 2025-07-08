@@ -1,5 +1,6 @@
 import 'dart:developer' as dev;
 
+import 'package:briscola_app/history/history.dart';
 import 'package:briscola_app/style/custom_text_styles.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
         Provider(create: (context) => SettingsController()),
         Provider(create: (context) => Palette()),
         Provider(create: (context) => CustomTextStyles()),
+        ChangeNotifierProvider(create: (context) => HistoryController()),
         // Set up audio.
         ProxyProvider2<AppLifecycleStateNotifier, SettingsController,
             AudioController>(
@@ -71,7 +73,8 @@ class MyApp extends StatelessWidget {
 
         return MaterialApp.router(
           title: 'Briscola app',
-          theme: ThemeData(scaffoldBackgroundColor: palette.background),
+          theme: ThemeData(
+              scaffoldBackgroundColor: palette.background, useMaterial3: true),
           routerConfig: router,
         );
       }),

@@ -4,6 +4,7 @@ import 'package:briscola_app/audio/sounds.dart';
 import 'package:briscola_app/game_internals/human_player.dart';
 import 'package:briscola_app/game_internals/player.dart';
 import 'package:briscola_app/game_internals/playing_card.dart';
+import 'package:briscola_app/history/history.dart';
 import 'package:briscola_app/play_session/card_positions.dart';
 import 'package:briscola_app/play_session/card_positions_controller.dart';
 import 'package:briscola_app/play_session/deck_widget.dart';
@@ -224,9 +225,14 @@ class _BoardWidgetState extends State<BoardWidget> {
       }
     });
 
+    // Things to do at the end of a game.
     if (shouldShowEndOfGameWindow) {
       // Reset in case of a new game.
       _cardsLeft = 40;
+
+      // Add the game to the heatmap.
+      final historyController = context.read<HistoryController>();
+      historyController.recordGame(DateTime.now());
     }
 
     return Stack(

@@ -75,4 +75,8 @@ class CustomTextStyles {
   /// The font of the difficulty selection menu items
   TextStyle get difficultyMenuEntry =>
       GoogleFonts.ubuntu(fontSize: 26, fontWeight: FontWeight.bold);
+
+  /// The font of the number of cards left.
+  TextStyle get cardsLeft => GoogleFonts.ubuntu(
+      fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black);
 }

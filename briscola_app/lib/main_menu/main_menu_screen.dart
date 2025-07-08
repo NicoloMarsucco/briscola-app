@@ -1,3 +1,4 @@
+import 'package:briscola_app/history/history.dart';
 import 'package:briscola_app/main_menu/main_menu_quote.dart';
 import 'package:briscola_app/main_menu/random_quote_provider.dart';
 import 'package:briscola_app/style/app_button_widget.dart';
@@ -6,9 +7,14 @@ import 'package:briscola_app/style/palette.dart';
 import 'package:briscola_app/style/responsive_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
+import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 
 class MainMenuScreen extends StatelessWidget {
+  static final _log = Logger('MainMenuScreen');
+
   MainMenuScreen({super.key});
 
   @override
@@ -16,64 +22,41 @@ class MainMenuScreen extends StatelessWidget {
     final palette = context.watch<Palette>();
     final customTextStyles = context.watch<CustomTextStyles>();
     final MainMenuQuote quote = RandomQuoteProvider.getRandomQuote();
-
+    var theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: palette.backgroundMain,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        actions: [
-          IconButton(
-              onPressed: () => GoRouter.of(context).go('/settings'),
-              icon: Icon(
-                Icons.settings,
-                color: palette.defaultWhite,
-              ))
-        ],
-      ),
-      body: ResponsiveScreen(
-        squarishMainArea: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Briscola\nLab',
-              textAlign: TextAlign.center,
-              style: customTextStyles.mainMenuTitle,
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            Text(
-              quote.getFormattedQuote(),
-              textAlign: TextAlign.center,
-              style: customTextStyles.homeScreenQuote,
-            ),
-            Text(
-              quote.getFormattedAuthor(),
-              textAlign: TextAlign.center,
-              style: customTextStyles.homeScreenSignature,
-            )
+        backgroundColor: palette.backgroundMain,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          actions: [
+            IconButton(
+                onPressed: () => GoRouter.of(context).go('/settings'),
+                icon: Icon(
+                  Icons.settings,
+                  color: palette.defaultWhite,
+                ))
           ],
         ),
-        rectangularMenuArea: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Center(child: _heatMapCalendar(context)),
+            SizedBox(
+              height: 50,
+            ),
             SizedBox(
               width: 150,
               child: AppButtonWidget(
                 text: "Play",
                 onPressed: () {
                   _showDifficultyDialog(context, customTextStyles);
-                  //GoRouter.of(context).go('/play');
                 },
                 palette: palette,
                 textStyles: customTextStyles,
               ),
-            ),
-            SizedBox(height: 80)
+            )
           ],
-        ),
-      ),
-    );
+        ));
   }
 
   Future<void> _showDifficultyDialog(
@@ -131,6 +114,46 @@ class MainMenuScreen extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _heatMapCalendar(BuildContext context) {
+    final now = DateTime.now();
+    final map = context.watch<HistoryController>().history;
+    _log.info("The map is now: $map");
+
+    return HeatmapCalendar<num>(
+      startDate: DateTime(now.year, now.month, now.day - 100),
+      endedDate: DateTime(now.year, now.month, now.day),
+      firstDay: DateTime.monday,
+      colorMap: Palette.heatmapColorsMap,
+      selectedMap: map,
+      monthLabelItemBuilder: (context, date, defaultFormat) {
+        return Text(
+          DateFormat(defaultFormat).format(date),
+          style: const TextStyle(
+            fontFamily:
+                'Montserrat', // 🎯 **Specify your desired font family here**
+            fontSize:
+                14.0, // You can adjust the size here too, overriding `monthLabelFontSize`
+            fontWeight: FontWeight.bold,
+            color: Colors.deepPurple, // Example color
+          ),
+        );
+      },
+      cellSize: const Size.square(16.0),
+      colorTipCellSize: const Size.square(12.0),
+      style: const HeatmapCalendarStyle.defaults(
+        cellValueFontSize: 6.0,
+        cellRadius: BorderRadius.all(Radius.circular(4.0)),
+        weekLabelValueFontSize: 12.0,
+        monthLabelFontSize: 12.0,
+      ),
+      layoutParameters: const HeatmapLayoutParameters.defaults(
+        monthLabelPosition: CalendarMonthLabelPosition.top,
+        weekLabelPosition: CalendarWeekLabelPosition.right,
+        colorTipPosition: CalendarColorTipPosition.bottom,
       ),
     );
   }
