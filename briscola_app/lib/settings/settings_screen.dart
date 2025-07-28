@@ -1,7 +1,6 @@
 import 'package:briscola_app/settings/settings.dart';
 import 'package:briscola_app/style/custom_text_styles.dart';
 import 'package:briscola_app/style/palette.dart';
-import 'package:briscola_app/style/responsive_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
