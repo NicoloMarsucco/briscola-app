@@ -5,20 +5,29 @@ import 'package:briscola_app/game_internals/strategies/random_strategy.dart';
 import 'package:briscola_app/game_internals/strategies/simple_strategy.dart';
 
 abstract class BotStrategy {
-  static BotStrategy fromLevel(String difficulty) {
+  static BotStrategy fromLevel(Difficulty difficulty) {
     switch (difficulty) {
-      case "easy":
+      case Difficulty.easy:
         return RandomStrategy();
-      case "medium":
+      case Difficulty.medium:
         return SimpleStrategy();
-      case "hard":
+      case Difficulty.hard:
         return ExpectimaxStrategy();
-      default:
-        return RandomStrategy();
     }
   }
 
-  void setUpBotStrategy(GameHistory gameHistory) {}
+  void setUpBotStrategy(GameHistory gameHistory);
 
   Future<PlayingCard> chooseCardToPlay(List<PlayingCard?> hand);
+}
+
+enum Difficulty {
+  easy,
+  medium,
+  hard;
+
+  static Difficulty fromString(String s) {
+    return Difficulty.values.firstWhere((d) => d.name == s.toLowerCase(),
+        orElse: () => Difficulty.easy);
+  }
 }
