@@ -1,4 +1,5 @@
 import 'package:briscola_app/game_internals/card_strength_comparator.dart';
+import 'package:briscola_app/game_internals/game_history.dart';
 import 'package:briscola_app/game_internals/playing_card.dart';
 import 'package:briscola_app/game_internals/strategies/bot_strategy.dart';
 import 'package:briscola_app/utils/bot_strategy_utils.dart';
@@ -19,9 +20,11 @@ import 'package:briscola_app/utils/bot_strategy_utils.dart';
 ///
 /// Only works for 2 player games.
 class SimpleStrategy extends BotStrategy {
+  late GameHistory _gameHistory;
+
   @override
   Future<PlayingCard> chooseCardToPlay(List<PlayingCard?> hand) async {
-    final briscolaSuit = gameHistory!.lastCard.suit;
+    final briscolaSuit = _gameHistory.lastCard.suit;
     final cardsAvailable = getAvailableCards(hand);
 
     final briscolas = cardsAvailable.where((card) => card.suit == briscolaSuit);
@@ -30,7 +33,7 @@ class SimpleStrategy extends BotStrategy {
     final worthlessNonBriscolas =
         nonBriscolas.where((card) => card.points == 0);
 
-    if (isFirstPlayer(gameHistory!.history)) {
+    if (isFirstPlayer(_gameHistory.history)) {
       // First player strategy
       if (worthlessNonBriscolas.isNotEmpty) {
         return findLowest(worthlessNonBriscolas);
@@ -42,7 +45,7 @@ class SimpleStrategy extends BotStrategy {
       return findLowest(briscolas);
     } else {
       // Second player strategy
-      final opponentCard = gameHistory!.history.last.cards.first;
+      final opponentCard = _gameHistory.history.last.cards.first;
 
       // Find cards that can beat opponent's card
       final beatingCards = cardsAvailable.where((card) =>
@@ -69,5 +72,10 @@ class SimpleStrategy extends BotStrategy {
         return findLowest(cardsAvailable);
       }
     }
+  }
+
+  @override
+  void setUpBotStrategy(GameHistory gameHistory) {
+    _gameHistory = gameHistory;
   }
 }

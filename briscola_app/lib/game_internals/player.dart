@@ -25,8 +25,8 @@ abstract class Player implements Comparable<Player> {
 
   @nonVirtual
   void subscribePlayerToGameHistory(GameHistory gameHistory) {
-    if (isBot) {
-      _botStrategy!.gameHistory = gameHistory;
+    if (_botStrategy != null) {
+      _botStrategy.setUpBotStrategy(gameHistory);
     }
   }
 
