@@ -2,6 +2,7 @@ import 'package:briscola_app/audio/audio_controller.dart';
 import 'package:briscola_app/game_internals/bot.dart';
 import 'package:briscola_app/game_internals/game.dart';
 import 'package:briscola_app/game_internals/human_player.dart';
+import 'package:briscola_app/game_internals/strategies/bot_strategy.dart';
 import 'package:briscola_app/main_menu/main_menu_screen.dart';
 import 'package:briscola_app/play_session/play_session_screen.dart';
 import 'package:briscola_app/settings/settings_screen.dart';
@@ -28,7 +29,8 @@ final router = GoRouter(
                 Provider.of<AudioController>(context, listen: false);
             audioController.stopAllSound();
 
-            final botPlayer = Bot(name: 'Bot', difficulty: difficulty);
+            final botPlayer =
+                Bot(name: 'Bot', difficulty: Difficulty.fromString(difficulty));
             final humanPlayer = HumanPlayer(name: 'Bob');
             final game = Game(players: [botPlayer, humanPlayer]);
 

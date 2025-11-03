@@ -46,7 +46,7 @@ void main() {
       fakePlayer.addCardToHand(cardThree);
       fakePlayer.removeCardFromHand(cardTwo);
       final List<PlayingCard?> expected = [cardOne, null, cardThree];
-      expect(fakePlayer, equals(expected));
+      expect(listEquals(fakePlayer.hand, expected), true);
     });
 
     group("Card collection functions properly", () {

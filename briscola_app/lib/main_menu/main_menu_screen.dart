@@ -37,7 +37,7 @@ class MainMenuScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              "Briscola\nArena",
+              "Briscola\nAI",
               style: customTextStyles.mainMenuTitle,
               textAlign: TextAlign.center,
             ),
@@ -92,6 +92,12 @@ class MainMenuScreen extends StatelessWidget {
                 color: Colors.orange,
                 textStyles: textStyles,
                 difficultyId: 'medium'),
+            difficultyOption(
+                context: context,
+                text: "Hard",
+                color: Colors.red,
+                textStyles: textStyles,
+                difficultyId: 'hard')
           ],
         );
       },

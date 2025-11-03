@@ -46,30 +46,40 @@ void main() {
         }
         expect(deck.cardsLeft, 0);
       });
-    });
 
-    group('Prepare deck method works correctly when called for a new game', () {
-      late Deck deck;
-      setUp(() {
-        deck = Deck();
+      test('Deck initialized with specific cards preserves order', () {
+        final customCards = [
+          PlayingCard(rank: 1, suit: Suit.bastoni),
+          PlayingCard(rank: 2, suit: Suit.spade),
+          PlayingCard(rank: 3, suit: Suit.denari),
+        ];
+
+        final deck = Deck(cardsToUse: customCards);
+
+        expect(deck.cardsLeft, 3);
+        expect(deck.drawTopCard(), equals(customCards[0]));
+        expect(deck.drawTopCard(), equals(customCards[1]));
+        expect(deck.drawTopCard(), equals(customCards[2]));
       });
 
-      test('New deck should contain 40 cards', () {
-        deck.prepareDeck();
-        expect(deck.cardsLeft, 40);
-      });
+      test('Original list of cards passed to Deck constructor is not modified',
+          () {
+        final originalCards = [
+          PlayingCard(rank: 1, suit: Suit.bastoni),
+          PlayingCard(rank: 2, suit: Suit.denari),
+          PlayingCard(rank: 3, suit: Suit.spade),
+        ];
 
-      test("Order of cards of the new deck should be different", () {
-        final List<PlayingCard> cardsFirstDeck = [];
-        final List<PlayingCard> cardsSecondDeck = [];
-        while (deck.cardsLeft > 0) {
-          cardsFirstDeck.add(deck.drawTopCard());
-        }
-        deck.prepareDeck();
-        while (deck.cardsLeft > 0) {
-          cardsSecondDeck.add(deck.drawTopCard());
-        }
-        expect(cardsFirstDeck, isNot(equals(cardsSecondDeck)));
+        // Make a copy of originalCards for comparison later.
+        final copyOfOriginal = List<PlayingCard>.from(originalCards);
+
+        final deck = Deck(cardsToUse: originalCards);
+
+        // Draw one card from deck to simulate deck usage.
+        deck.drawTopCard();
+
+        // The original list should remain unchanged.
+        expect(originalCards, equals(copyOfOriginal));
       });
     });
   });

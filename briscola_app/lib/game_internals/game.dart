@@ -13,8 +13,7 @@ class Game {
 
   Game({required List<Player> players}) : _players = players {
     _getSuitOfBriscola();
-    gameHistory = GameHistory(
-        lastCard: deck.peekLastCard, numberOfPlayers: players.length);
+    gameHistory = GameHistory(lastCard: deck.peekLastCard);
     _subscribeBotsToHistory();
     _roundManager = RoundManager(game: this);
   }
@@ -53,11 +52,9 @@ class Game {
 
   // API to start a new game
   void startNewGame() {
-    deck.prepareDeck();
     _resetPlayersPoints();
     _getSuitOfBriscola();
-    gameHistory = GameHistory(
-        lastCard: deck.peekLastCard, numberOfPlayers: _players.length);
+    gameHistory = GameHistory(lastCard: deck.peekLastCard);
     _subscribeBotsToHistory();
     _roundManager.prepareForNewGame();
     startGame();
