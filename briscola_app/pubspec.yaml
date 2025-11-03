@@ -45,6 +45,7 @@ dependencies:
   shared_preferences: ^2.5.3
   simple_heatmap_calendar: ^0.4.0
   intl: ^0.20.2
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +75,7 @@ flutter:
     - assets/cards/
     - assets/music/
     - assets/sfx/
+    - assets/icon/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
