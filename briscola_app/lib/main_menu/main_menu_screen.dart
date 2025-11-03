@@ -37,7 +37,7 @@ class MainMenuScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              "Briscola\nArena",
+              "Briscola\nAI",
               style: customTextStyles.mainMenuTitle,
               textAlign: TextAlign.center,
             ),
