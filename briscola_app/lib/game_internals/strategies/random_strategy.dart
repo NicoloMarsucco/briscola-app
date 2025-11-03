@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:briscola_app/game_internals/game_history.dart';
 import 'package:briscola_app/game_internals/strategies/bot_strategy.dart';
 import 'package:briscola_app/game_internals/playing_card.dart';
 
@@ -12,4 +13,7 @@ class RandomStrategy extends BotStrategy {
     final availableCards = hand.whereType<PlayingCard>().toList();
     return availableCards[_random.nextInt(availableCards.length)];
   }
+
+  @override
+  void setUpBotStrategy(GameHistory gameHistory) {}
 }
